@@ -35,7 +35,7 @@ function Carousel() {
   ];
 
   return (
-    <div className="w-[800px] text-[13px] text-[#666666]">
+    <div className="w-[850px] text-[13px] text-[#666666]">
       {/* Main Swiper */}
       <Swiper
         className="h-[268px]"
