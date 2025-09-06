@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, A11y, Thumbs } from "swiper/modules";
+import { Navigation, Pagination, A11y, Thumbs ,Autoplay} from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -39,10 +39,14 @@ function Carousel() {
       {/* Main Swiper */}
       <Swiper
         className="h-[268px]"
-        modules={[Navigation, Pagination, A11y, Thumbs]}
+        modules={[Navigation, Pagination, A11y, Thumbs,Autoplay]}
         spaceBetween={10}
         slidesPerView={1}
         navigation
+         autoplay={{
+          delay: 3000, // 3s per slide
+          disableOnInteraction: false, // keep autoplay after manual swipe
+        }}
         // pagination={{ clickable: true }}
         thumbs={{ swiper: thumbsSwiper }}
       >
