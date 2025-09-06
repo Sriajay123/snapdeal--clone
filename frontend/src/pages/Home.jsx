@@ -13,6 +13,7 @@ function Home() {
     <Navbar/>
      <div className='bg-[#f7f7f7] pt-4 flex gap-4'> 
       <Sidebar/> 
+      <Carousel/>
      
       </div> 
        </div> 
