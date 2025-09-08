@@ -69,7 +69,7 @@ function Carousel() {
           onSwiper={setThumbsSwiper}
           modules={[Thumbs]}
           watchSlidesProgress
-          slidesPerView={slides.length} // 👈 all tabs in one line
+          slidesPerView={slides.length}
           spaceBetween={0}
           className="h-[40px]"
         >
