@@ -5,42 +5,62 @@ import sendOtp from '../utils/sendOtp.js';
 import jwt from 'jsonwebtoken'
 
 
-
-export async function regin(req, res) {
+export async function checkUser(req, res) {
   try {
-    let { name, email, phone, dob, password } = req.body;
+    const { email, phone } = req.body;
 
     let user = await User.findOne({ $or: [{ email }, { phone }] });
 
-    if (!user) {
-      // For new user: require ALL fields
-      if (!name || !email || !phone || !password) {
-        return res.status(400).json({ message: "All fields are required for signup" });
-      }
-      const salt = await bcrypt.genSalt(10)
-      password = await bcrypt.hash(password, salt);
+    if (user) {
+      // existing user → send OTP
+      const otpCode = String(Math.floor(1000 + Math.random() * 9000));
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-      user = await User.create({ name, email, phone, dob, password });
+      await OTP.create({ userId: user._id, otpCode, expiresAt });
+      await sendOtp(user, otpCode);
+
+      return res.json({ success: true, isNewUser: false, message: "OTP sent" });
     }
 
+    // new user → just tell frontend
+    return res.json({ success: true, isNewUser: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
 
+export async function registerUser(req, res) {
+  try {
+    let { name, email, phone, dob, password } = req.body;
+
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    let existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "User already exists" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    password = await bcrypt.hash(password, salt);
+
+    const user = await User.create({ name, email, phone, dob, password });
+
+    // send OTP after registration
     const otpCode = String(Math.floor(1000 + Math.random() * 9000));
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     await OTP.create({ userId: user._id, otpCode, expiresAt });
+    await sendOtp(user, otpCode);
 
-    await sendOtp(user, otpCode)
-    console.log(`OTP for ${user.phone}: ${otpCode}`);
-
-    res.json({
-      message: "OTP sent successfully",
-       
-    });
+    res.json({ success: true, message: "Registered successfully. OTP sent" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
-};
+}
 
 
 export async function verifyOtp(req, res) {
@@ -77,7 +97,10 @@ export async function verifyOtp(req, res) {
     )
 
     res.json({ message: "login successfull",
-      token
+      token,
+       user: { name: existingUser.name, email: existingUser.email, phone: existingUser.phone }
+       
+       
     })
 
   } catch (error) {
