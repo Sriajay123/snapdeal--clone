@@ -4,7 +4,9 @@ import express from 'express'
 import cors from 'cors'
 
 
+
 import userroute from './routes/userRoute.js'
+import productRoute from './routes/productRoute.js'
 
 import dbConfig from './config/dbConfig.js'
 
@@ -20,7 +22,9 @@ app.use(
     credentials: true,               // allow sending cookies
   })
 );
+
 app.use('/user',userroute)
+app.use('/product', productRoute)
 
 
 
