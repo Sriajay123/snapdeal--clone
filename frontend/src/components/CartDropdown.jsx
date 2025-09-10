@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { setPincode } from "../store/pincodeSlice";
+import CartFooter from "./CartFooter";
 
 function CartDropdown({ isOpen, onClose }) {
     const cart = useSelector((state) => state.cart);
@@ -57,19 +58,19 @@ function CartDropdown({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return (
-        <>
+        <>  
+      
             {/* Modal Backdrop */}
             <div
-                className="fixed inset-0 "
-                onClick={onClose}
+                className="fixed inset-0 " onClick={onClose}
             ></div>
-
+           
             {/* Modal Dialog */}
             <div className="absolute top-[100px] ml-[200px] mt-2 bg-white rounded shadow-2xl w-[950px] z-50 border border-gray-200">
                 {/* Cart Container */}
-                <div className="cart-container" style={{ minHeight: "400px" }}>
+                <div className="min-h-[400px]">
                     {/* Cart Heading */}
-                    <div className="cart-heading bg-white px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                    <div className="bg-white px-4 py-3 border-b border-gray-200 flex justify-between items-center">
                         <h3 className="text-lg font-normal text-gray-700">
                             Shopping Cart{" "}
                             <span className="text-gray-500">({cart.count} Items)</span>
@@ -83,8 +84,8 @@ function CartDropdown({ isOpen, onClose }) {
                     </div>
 
                     {/* Cart Head Labels */}
-                    <div className="cart-head-label-wrapper bg-white border-b border-gray-100">
-                        <div className="cart-head-label px-4 py-2">
+                    <div className="bg-white border-b border-gray-100">
+                        <div className="px-4 py-2">
                             <div className="grid grid-cols-12 gap-4 text-xs text-gray-600">
                                 <div className="col-span-3">
                                     <span>Item Details</span>
@@ -140,7 +141,7 @@ function CartDropdown({ isOpen, onClose }) {
 
                     {/* Cart Items List */}
                     <div
-                        className="cart-items-list bg-white"
+                        className="bg-white"
                         style={{ maxHeight: "300px", overflowY: "auto" }}
                     >
                         {cart.items.length === 0 ? (
@@ -152,37 +153,41 @@ function CartDropdown({ isOpen, onClose }) {
                                 {cart.items.map(({ product, quantity }) => (
                                     <li
                                         key={product._id}
-                                        className="cart-item border-b border-gray-100"
+                                        className="border-b border-gray-100"
                                     >
                                         <div className="grid grid-cols-12 gap-4 px-4 py-4 items-start">
                                             {/* Product Image */}
                                             <div className="col-span-3 flex items-start gap-3">
-                                                <div className="img-field">
+                                                <div className="product-image">
                                                     <img
-                                                        className="item-image w-16 h-16 object-contain border border-gray-200 rounded p-1"
+                                                        className="w-16 h-16 object-contain border border-gray-200 rounded p-1"
                                                         src={product.image}
                                                         alt={product.name}
                                                     />
                                                 </div>
-                                                <div className="item-description flex-1">
-                                                    <div className="item-name-wrapper mb-2">
-                                                        <span className="item-name text-sm text-gray-800 leading-tight">
+                                                <div className="product-details flex-1">
+                                                    <div className="product-name mb-2">
+                                                        <span className="text-sm text-gray-800 leading-tight">
                                                             {product.name}
                                                         </span>
                                                     </div>
-                                                    <p className="item-extra-feature text-xs text-gray-500 mb-2">
+                                                    <p className="product-attributes text-xs text-gray-500 mb-2">
                                                         {product.selectedSize && (
                                                             <>
                                                                 <span> | </span>
                                                                 <span>Size: {product.selectedSize}</span>
+                                                            </>
+                                                        )}
+                                                        {product.colors && product.colors.length > 0 && (
+                                                            <>
                                                                 <span> | </span>
-                                                                <span>Color: Orange</span>
+                                                                <span>Color: {product.selectedColor || product.colors[0]}</span>
                                                             </>
                                                         )}
                                                     </p>
-                                                    <div className="remove-item-div">
+                                                    <div className="remove-button">
                                                         <button
-                                                            className="remove-item-shortlist text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                                                            className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
                                                             onClick={() => handleRemove(product._id)}
                                                         >
                                                             ✕ REMOVE
@@ -192,16 +197,16 @@ function CartDropdown({ isOpen, onClose }) {
                                             </div>
 
                                             {/* Price */}
-                                            <div className="col-span-2 unit-price-block text-center">
-                                                <span className="item-price text-sm font-medium">
+                                            <div className="col-span-2 price-section text-center">
+                                                <span className="text-sm font-medium">
                                                     Rs. {product.price}
                                                 </span>
                                             </div>
 
                                             {/* Quantity */}
-                                            <div className="col-span-2 cart-item-quantity text-center">
+                                            <div className="col-span-2 quantity-section text-center">
                                                 <select
-                                                    className="item-quantity border border-gray-300 rounded px-2 py-1 text-sm w-16 bg-white focus:outline-none"
+                                                    className="border border-gray-300 rounded px-2 py-1 text-sm w-16 bg-white focus:outline-none"
                                                     value={quantity}
                                                     onChange={(e) =>
                                                         handleQuantityChange(
@@ -219,11 +224,11 @@ function CartDropdown({ isOpen, onClose }) {
                                             </div>
 
                                             {/* Delivery Container */}
-                                            <div className="col-span-3 delivery-container text-center">
-                                                <div className="delivery-options">
+                                            <div className="col-span-3 delivery-section text-center">
+                                                <div className="delivery-info">
                                                     <span className="text-xs text-gray-600">
                                                         Standard Delivery By 15 Sep - 17 Sep
-                                                        <span className="avail-free text-green-600 font-semibold ml-1">
+                                                        <span className="text-green-600 font-semibold ml-1">
                                                             FREE
                                                         </span>
                                                     </span>
@@ -231,8 +236,8 @@ function CartDropdown({ isOpen, onClose }) {
                                             </div>
 
                                             {/* Subtotal */}
-                                            <div className="col-span-2 cart-item-details text-right">
-                                                <span className="item-subtotal-black text-sm font-medium">
+                                            <div className="col-span-2 subtotal-section text-right">
+                                                <span className="text-sm font-medium">
                                                     Rs. {(product.price * quantity).toLocaleString()}
                                                 </span>
                                             </div>
@@ -245,73 +250,11 @@ function CartDropdown({ isOpen, onClose }) {
                 </div>
 
                 {/* Cart Footer */}
-                <div
-                    className="bg-black border-t border-gray-200 width-full"
-                    style={{ height: "120px" }}
-                >
-                    <div className="cart-footer-content px-4 py-4">
-                        <div className="flex">
-                            {/* Left Side */}
-                            <div className="flex-1 cart-trust-wrap pr-8">
-                                <div className="cart-message text-xs text-gray-400 mb-3">
-                                    Delivery and payment options can be selected later
-                                </div>
-                                <div className=" flex flex-col space-y-4 text-xs text-gray-400">
-                                    <div>
-                                    
-                                        <i class="fa-solid fa-shield-halved"></i>
-                                        <span>Safe and Secure Payments</span>
-                                     </div>
-                                    <div >   
-                                         <i class="fas fa-credit-card"></i>
-                                        <span>100% Payment Protection, Easy Returns Policy</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right Side */}
-                            <div className="flex gap-4">
-                                {/* Bill Summary */}
-                                <div className="cart-bill-summary">
-                                    <div className="cart-bill-wrapper">
-                                        <div className="sub-total-charges">
-                                            <div className="cart-sub-total text-right mb-1 overflow-hidden">
-                                                <label className="float-left text-sm text-gray-400">
-                                                    Sub Total:{" "}
-                                                </label>
-                                                <span className="float-right text-sm font-bold text-white">
-                                                    Rs. {subtotal.toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <div className="cart-sub-total text-right mb-3 overflow-hidden">
-                                                <label className="float-left text-sm text-gray-400">
-                                                    Delivery Charges:{" "}
-                                                </label>
-                                                <span className="text-green-400 font-bold text-sm float-right">
-                                                    FREE
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Button Section */}
-                                <div className="cart-bill-summary">
-                                    <div className="cart-bill-wrapper">
-                                        <button
-                                            type="button"
-                                            className="btn btn-xl cart-button bg-[#e40046] text-white font-bold text-sm hover:bg-[#c2003d] transition-colors py-3 px-6 rounded"
-                                            style={{ lineHeight: "0", width: "100%" }}
-                                        >
-                                            PROCEED TO PAY Rs. {subtotal.toLocaleString()}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
+               <CartFooter subtotal={subtotal}  />
             </div>
+             
+           
         </>
     );
 }

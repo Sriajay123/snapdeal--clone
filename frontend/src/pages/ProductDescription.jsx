@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../api/api";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
+import OTPVerificationPopup from "../components/OTPVerificationPopup";
+import ProductDetailsTabs from "../components/ProductDetailsTabs";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
 import { setPincode } from "../store/pincodeSlice";
@@ -13,6 +15,7 @@ function ProductDescription() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
@@ -23,13 +26,29 @@ function ProductDescription() {
   // Local UI state for handling pincode input/edit
   const [deliveryPin, setDeliveryPin] = useState("");
   const [isCheckingPin, setIsCheckingPin] = useState(true);
+  const [showOTPPopup, setShowOTPPopup] = useState(false);
+
+  const handleBuyNow = () => {
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+    setShowOTPPopup(true);
+  };
 
   // Fetch product by ID
   useEffect(() => {
     api
       .get(`/product/${id}`)
       .then((res) => {
-        setProduct(res.data.product);
+        const productData = res.data.product;
+        setProduct(productData);
+        
+        // Set default color if colors are available
+        if (productData.colors && productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0]);
+        }
+        
         setLoading(false);
         
         // Save to recently viewed
@@ -107,7 +126,30 @@ function ProductDescription() {
     <>
       <Header />
       <Navbar />
-      <div className="bg-white min-h-screen">
+      <div className="bg-[#f7f7f7] min-h-screen">
+        {/* Breadcrumbs */}
+        <div className=" border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <nav className="flex items-center space-x-2 text-sm text-gray-600">
+              <Link to="/" className="hover:text-blue-600 transition-colors">
+               
+                Home
+              </Link>
+              <span className="text-gray-400">›</span>
+              <Link to="#" className="hover:text-blue-600 transition-colors">
+                {product.category || 'Electronics'}
+              </Link>
+              <span className="text-gray-400">›</span>
+              <Link to="#" className="hover:text-blue-600 transition-colors">
+                {product.subcategory || product.category || 'Products'}
+              </Link>
+              <span className="text-gray-400">›</span>
+              <span className="text-gray-800 font-medium truncate">
+                {product.name}
+              </span>
+            </nav>
+          </div>
+        </div>
         <div className="flex justify-center px-4 py-6">
           <div className="w-[1250px] h-[625px] flex gap-8 border border-gray-200 bg-white">
             {/* Left: Image Gallery with Thumbnails */}
@@ -179,11 +221,6 @@ function ProductDescription() {
                     ></div>
                   )}
                 </div>
-                
-                {/* Image counter */}
-                <div className="absolute top-4 right-4 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
-                  {selectedImageIdx + 1} / {images.length}
-                </div>
               </div>
             </div>
 
@@ -251,50 +288,86 @@ function ProductDescription() {
                 </div>
               </div>
 
-              {/* Size Selection - Always show sizes */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-gray-700 text-base">Size</span>
-                  <span className="text-blue-500 text-sm cursor-pointer hover:underline">Size Chart</span>
+              {/* Size Selection - Only show if product has sizes */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-gray-700 text-base">Size</span>
+                    <span className="text-blue-500 text-sm cursor-pointer hover:underline">Size Chart</span>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        className={`border px-4 py-2 text-sm font-medium transition-all min-w-[50px] ${
+                          selectedSize === size
+                            ? "border-blue-500 bg-blue-50 text-blue-600"
+                            : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                        }`}
+                        onClick={() => setSelectedSize(size)}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {(product.sizes && product.sizes.length > 0 ? product.sizes : ['S', 'M', '3XL', 'L', 'XL', '2XL']).map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      className={`border px-4 py-2 text-sm font-medium transition-all min-w-[50px] ${
-                        selectedSize === size
-                          ? "border-blue-500 bg-blue-50 text-blue-600"
-                          : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                      }`}
-                      onClick={() => setSelectedSize(size)}
-                    >
-                      {size}
-                    </button>
-                  ))}
+              )}
+
+              {/* Color Selection - Only show if product has colors */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="mb-6">
+                  <div className="mb-3">
+                    <span className="text-gray-700 text-base">Color</span>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.colors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`border px-4 py-2 text-sm font-medium transition-all min-w-[80px] ${
+                          selectedColor === color
+                            ? "border-green-500 bg-green-50 text-green-600"
+                            : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                        }`}
+                        onClick={() => setSelectedColor(color)}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Action buttons */}
               <div className="flex gap-3 mb-6">
                 <button
                   className="bg-gray-600 text-white px-8 py-3 font-semibold hover:bg-gray-700 disabled:opacity-50 transition-colors flex-1 max-w-[200px]"
                   onClick={() => {
-                    const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : ['S', 'M', '3XL', 'L', 'XL', '2XL'];
-                    if (availableSizes.length > 0 && !selectedSize) return;
-                    dispatch(
-                      addToCart(
-                        availableSizes.length > 0
-                          ? { ...product, selectedSize }
-                          : product
-                      )
-                    );
+                    // If product has sizes, require size selection. If no sizes, allow direct add to cart
+                    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                      return; // Don't add if sizes exist but none selected
+                    }
+                    
+                    let productToAdd = { ...product };
+                    if (product.sizes && product.sizes.length > 0 && selectedSize) {
+                      productToAdd.selectedSize = selectedSize;
+                    }
+                    if (product.colors && product.colors.length > 0) {
+                      productToAdd.selectedColor = selectedColor || product.colors[0];
+                    }
+                    
+                    dispatch(addToCart(productToAdd));
                   }}
-                  disabled={((product.sizes && product.sizes.length > 0) || (!product.sizes)) && !selectedSize}
+                  disabled={product.sizes && product.sizes.length > 0 && !selectedSize}
                 >
                   ADD TO CART
                 </button>
-                <button className="bg-[#e40046] text-white px-8 py-3 font-semibold hover:bg-[#c2003d] transition-colors flex items-center gap-2 flex-1 max-w-[200px] justify-center">
+                <button 
+                  className="bg-[#e40046] text-white px-8 py-3 font-semibold hover:bg-[#c2003d] transition-colors flex items-center gap-2 flex-1 max-w-[200px] justify-center"
+                  onClick={handleBuyNow}
+                  disabled={product.sizes && product.sizes.length > 0 && !selectedSize}
+                >
                   <i className="fas fa-bolt"></i>
                   BUY NOW
                 </button>
@@ -353,6 +426,20 @@ function ProductDescription() {
           </div>
         </div>
       </div>
+
+      {/* Product Details Tabs */}
+      <div className="max-w-7xl mx-auto px-4 pb-12">
+        <ProductDetailsTabs product={product} />
+      </div>
+      
+      {/* OTP Verification Popup */}
+      <OTPVerificationPopup
+        isOpen={showOTPPopup}
+        onClose={() => setShowOTPPopup(false)}
+        orderTotal={product?.price?.toLocaleString() || "0"}
+      />
+
+      
     </>
   );
 }

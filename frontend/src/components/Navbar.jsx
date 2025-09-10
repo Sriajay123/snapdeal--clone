@@ -95,9 +95,14 @@ function Navbar() {
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2 text-[13px] cursor-pointer text-white">
-                <span>Sign In</span>
-                <img src={signin} alt="Sign In" className="h-5 w-6" />
+              <div className="flex items-center gap-4">
+                {/* Admin Link */}
+               
+                
+                <div className="flex items-center gap-2 text-[13px] cursor-pointer text-white">
+                  <span>Sign In</span>
+                  <img src={signin} alt="Sign In" className="h-5 w-6" />
+                </div>
               </div>
               <div className="absolute right-0 mt-2 w-48 bg-[#333333] text-white rounded shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                 <div className="p-3 border-b border-gray-600">
