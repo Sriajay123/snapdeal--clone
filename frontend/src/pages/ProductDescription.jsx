@@ -29,6 +29,14 @@ function ProductDescription() {
       .then((res) => {
         setProduct(res.data.product);
         setLoading(false);
+        
+        // Save to recently viewed
+        const viewedIds = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+        if (!viewedIds.includes(id)) {
+          viewedIds.unshift(id); // Add to beginning
+          if (viewedIds.length > 10) viewedIds.pop(); // Keep only 10 items
+          localStorage.setItem("recentlyViewed", JSON.stringify(viewedIds));
+        }
       })
       .catch(() => {
         setError("Failed to load product");

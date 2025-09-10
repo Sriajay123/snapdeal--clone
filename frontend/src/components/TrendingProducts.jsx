@@ -46,7 +46,7 @@ function TrendingProducts() {
                 >
                     {products.map((product, idx) => (
                         <SwiperSlide key={product._id || idx}>
-                            <Link to={`/product/${product.keyword || product.name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, '-')}/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }} target="_blank" rel="noopener noreferrer">
+                            <Link to={`/product/${product.keyword || product.name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, '-')}/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <div
                                     className="p-5 flex flex-col transition-all duration-200 hover:border-[#f6f6f6] hover:shadow-xl hover-bg-white"
                                     style={{ height: "393px" }}

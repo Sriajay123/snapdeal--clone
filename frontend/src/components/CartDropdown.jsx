@@ -65,7 +65,7 @@ function CartDropdown({ isOpen, onClose }) {
             ></div>
 
             {/* Modal Dialog */}
-            <div className="absolute top-[100px] right-0 mt-2 bg-white rounded shadow-2xl w-[950px] z-50 border border-gray-200">
+            <div className="absolute top-[100px] ml-[200px] mt-2 bg-white rounded shadow-2xl w-[950px] z-50 border border-gray-200">
                 {/* Cart Container */}
                 <div className="cart-container" style={{ minHeight: "400px" }}>
                     {/* Cart Heading */}
