@@ -4,14 +4,16 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   price: { type: Number, required: true },
-  category: { type: String },
+  category: { type: String, required: true },
+  subcategory: { type: String },
   brand: { type: String },
-  image: { type: String },
+  images: [{ type: String }], // Array of image URLs
   stock: { type: Number, default: 0 },
-  rating: { type: Number, default: 0 },
+  rating: { type: Number, default: 0, min: 0, max: 5 },
   numReviews: { type: Number, default: 0 },
   sizes: [{ type: String }], // e.g., ["S", "M", "L", "XL"]
-  keyword: {type: String,required: true, unique: true},
+  colors: [{ type: String }], // e.g., ["Red", "Blue", "Black"]
+  keyword: { type: String, required: true, unique: true },
   createdAt: { type: Date, default: Date.now }
 });
 
