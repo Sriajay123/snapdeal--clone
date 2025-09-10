@@ -1,7 +1,10 @@
+
+import qrcode from '../assets/qrcode.png'
+
 function Sidebar() {
   return (
 
-    <div className="w-[200px] h-[625px] ml-[90px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm">
+    <div className="w-[230px] h-[625px] ml-[80px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm">
 
       <div className="pt-2 pl-6">
         <span className="text-[11px] text-[#333333] ">TOP CATEGORIES</span>
@@ -54,6 +57,18 @@ function Sidebar() {
 
 
       </div>
+     
+        <div className="flex  mt-20"> 
+          <img src={qrcode} alt="qr code" className="w-20 h-20" />
+           <div>
+            <p className="text-[13px] mt-2 mb-1">Enjoy Convenient Order Tracking</p>
+            <span className="text-[10px] ">scan to download app</span>
+          </div>
+        </div>
+        <div>
+        
+        </div>
+     
     </div>
 
   );
