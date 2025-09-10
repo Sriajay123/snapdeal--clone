@@ -436,6 +436,7 @@ function ProductDescription() {
       <OTPVerificationPopup
         isOpen={showOTPPopup}
         onClose={() => setShowOTPPopup(false)}
+        onPaymentSuccess={() => setShowOTPPopup(false)}
         orderTotal={product?.price?.toLocaleString() || "0"}
       />
 

@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import OTPVerificationPopup from "./OTPVerificationPopup";
 
-function CartFooter({ subtotal }) {
+function CartFooter({ subtotal, onCartClose }) {
     const [showOTPPopup, setShowOTPPopup] = useState(false);
 
     const handleProceedToPay = () => {
         setShowOTPPopup(true);
+    };
+
+    const handleOTPClose = () => {
+        setShowOTPPopup(false);
+    };
+
+    const handlePaymentSuccess = () => {
+        setShowOTPPopup(false);
+        if (onCartClose) {
+            onCartClose(); // Close cart dropdown
+        }
     };
     return (
         <div className="bg-black border-t border-gray-200 w-full px-4 py-3">
@@ -53,7 +64,8 @@ function CartFooter({ subtotal }) {
             {/* OTP Verification Popup */}
             <OTPVerificationPopup
                 isOpen={showOTPPopup}
-                onClose={() => setShowOTPPopup(false)}
+                onClose={handleOTPClose}
+                onPaymentSuccess={handlePaymentSuccess}
                 orderTotal={subtotal.toLocaleString()}
             />
         </div>

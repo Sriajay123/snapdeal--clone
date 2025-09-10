@@ -251,7 +251,7 @@ function CartDropdown({ isOpen, onClose }) {
 
                 {/* Cart Footer */}
                 
-               <CartFooter subtotal={subtotal}  />
+               <CartFooter subtotal={subtotal} onCartClose={onClose} />
             </div>
              
            
