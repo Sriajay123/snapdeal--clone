@@ -4,6 +4,7 @@ import ProductDescription from "./pages/ProductDescription"
 import AdminLogin from "./pages/AdminLogin"
 import AdminDashboard from "./pages/AdminDashboard"
 import MyOrders from "./pages/MyOrders"
+import OrderDetails from "./pages/OrderDetails"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
@@ -17,6 +18,11 @@ function App() {
         <Route path="/my-orders" element={
           <ProtectedRoute>
             <MyOrders/>
+          </ProtectedRoute>
+        } />
+        <Route path="/order-details/:orderNumber" element={
+          <ProtectedRoute>
+            <OrderDetails/>
           </ProtectedRoute>
         } />
       </Routes>

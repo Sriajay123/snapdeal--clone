@@ -243,7 +243,10 @@ function MyOrders() {
                                                                 Placed on {formatDate(order.createdAt)}
                                                             </p>
                                                         </div>
-                                                        <button className="bg-gray-700 text-white px-6 py-2 text-sm font-semibold rounded hover:bg-gray-800 transition-colors">
+                                                        <button 
+                                                            onClick={() => navigate(`/order-details/${order.orderNumber}`)}
+                                                            className="bg-gray-700 text-white px-6 py-2 text-sm font-semibold rounded hover:bg-gray-800 transition-colors"
+                                                        >
                                                             DETAILS
                                                         </button>
                                                     </div>
