@@ -8,8 +8,10 @@ import cors from 'cors'
 import userroute from './routes/userRoute.js'
 import productRoute from './routes/productRoute.js'
 import orderRoute from './routes/orderRoute.js'
+import paymentRoute from './routes/paymentRoute.js'
 
 import dbConfig from './config/dbConfig.js'
+import Razorpay from 'razorpay'
 
 const app=express()
 app.use(express.json())
@@ -23,9 +25,16 @@ app.use(
 dbConfig()
 const port=process.env.PORT
 
+export const instance=new Razorpay({
+
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+})
+
 app.use('/user',userroute)
 app.use('/product', productRoute)
 app.use('/orders', orderRoute)
+app.use('/payment', paymentRoute)
 
 
 

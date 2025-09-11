@@ -27,12 +27,24 @@ function ProductDescription() {
   const [deliveryPin, setDeliveryPin] = useState("");
   const [isCheckingPin, setIsCheckingPin] = useState(true);
   const [showOTPPopup, setShowOTPPopup] = useState(false);
+  const [buyNowProduct, setBuyNowProduct] = useState(null);
 
   const handleBuyNow = () => {
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       alert("Please select a size");
       return;
     }
+    
+    // Prepare product with selected options for buyNow
+    let buyNowProduct = { ...product };
+    if (product.sizes && product.sizes.length > 0 && selectedSize) {
+      buyNowProduct.selectedSize = selectedSize;
+    }
+    if (product.colors && product.colors.length > 0) {
+      buyNowProduct.selectedColor = selectedColor || product.colors[0];
+    }
+    
+    setBuyNowProduct(buyNowProduct);
     setShowOTPPopup(true);
   };
 
@@ -435,9 +447,16 @@ function ProductDescription() {
       {/* OTP Verification Popup */}
       <OTPVerificationPopup
         isOpen={showOTPPopup}
-        onClose={() => setShowOTPPopup(false)}
-        onPaymentSuccess={() => setShowOTPPopup(false)}
+        onClose={() => {
+          setShowOTPPopup(false);
+          setBuyNowProduct(null);
+        }}
+        onPaymentSuccess={() => {
+          setShowOTPPopup(false);
+          setBuyNowProduct(null);
+        }}
         orderTotal={product?.price?.toLocaleString() || "0"}
+        buyNowProduct={buyNowProduct}
       />
 
       

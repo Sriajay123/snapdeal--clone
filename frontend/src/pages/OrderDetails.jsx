@@ -228,12 +228,14 @@ function OrderDetails() {
                                                 </h4>
                                             </div>
                                             
-                                            <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
-                                                <span>Size: <span className="font-medium text-gray-800">{item?.productDetails?.selectedSize || item?.selectedSize || '9'}</span></span>
-                                                <span>Color: <span className="font-medium text-gray-800">{item?.productDetails?.selectedColor || item?.selectedColor || 'Blue'}</span></span>
-                                            </div>
-                                            
-                                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
+                                {(item?.productDetails?.selectedSize || item?.selectedSize) && (
+                                    <span>Size: <span className="font-medium text-gray-800">{item?.productDetails?.selectedSize || item?.selectedSize}</span></span>
+                                )}
+                                {(item?.productDetails?.selectedColor || item?.selectedColor) && (
+                                    <span>Color: <span className="font-medium text-gray-800">{item?.productDetails?.selectedColor || item?.selectedColor}</span></span>
+                                )}
+                            </div>                                            <div className="flex items-center gap-4">
                                                 <button className="border border-gray-400 text-gray-700 px-4 py-1 text-sm rounded hover:bg-gray-50 transition-colors">
                                                     CANCEL
                                                 </button>

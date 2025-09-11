@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../store/cartSlice";
+import { useRazorpay } from "../hooks/useRazorpay";
 import api from "../api/api";
 
-function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal }) {
+function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal, buyNowProduct }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const cart = useSelector((state) => state.cart);
+    const { initiatePayment, loading: razorpayLoading } = useRazorpay();
     const [currentStep, setCurrentStep] = useState(1); // 1: OTP, 2: Address, 3: Payment
     const [isProcessing, setIsProcessing] = useState(false);
+    const [createdOrder, setCreatedOrder] = useState(null); // Store created order for payment
     
     // OTP Step
     const [mobileNumber, setMobileNumber] = useState("+919591933353");
@@ -93,6 +96,17 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
         // Start processing payment
         setIsProcessing(true);
         console.log("Processing payment with method:", paymentMethod);
+        console.log("Current cart state:", cart);
+        console.log("Cart items count:", cart.items?.length || 0);
+        console.log("Buy now product:", buyNowProduct);
+        console.log("Full cart object:", JSON.stringify(cart, null, 2));
+        
+        // Check if cart is empty and no buyNow product
+        if ((!cart.items || cart.items.length === 0) && !buyNowProduct) {
+            alert("Your cart is empty. Please add items to cart before placing an order.");
+            setIsProcessing(false);
+            return;
+        }
         
         try {
             // Prepare order data
@@ -103,15 +117,31 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
                     email: "" // Could add email field if needed
                 },
                 shippingAddress: address,
-                items: cart.items.map(item => ({
-                    product: item.product._id, // MongoDB ObjectId reference
+                items: buyNowProduct ? [
+                    // For Buy Now - create single item from product
+                    {
+                        product: buyNowProduct._id,
+                        productDetails: {
+                            name: buyNowProduct.name,
+                            brand: buyNowProduct.brand || "",
+                            price: buyNowProduct.price,
+                            image: buyNowProduct.image || (buyNowProduct.images && buyNowProduct.images[0]) || "",
+                            selectedSize: buyNowProduct.selectedSize || "",
+                            selectedColor: buyNowProduct.selectedColor || ""
+                        },
+                        quantity: 1,
+                        price: buyNowProduct.price
+                    }
+                ] : cart.items.map(item => ({
+                    // For Cart - map existing cart items
+                    product: item.product._id,
                     productDetails: {
                         name: item.product.name,
                         brand: item.product.brand || "",
                         price: item.product.price,
                         image: item.product.image,
-                        selectedSize: item.selectedSize || "",
-                        selectedColor: item.selectedColor || ""
+                        selectedSize: item.product.selectedSize || "",
+                        selectedColor: item.product.selectedColor || ""
                     },
                     quantity: item.quantity,
                     price: item.product.price
@@ -123,63 +153,117 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
                 },
                 paymentInfo: {
                     method: paymentMethod,
-                    transactionId: paymentMethod === "card" ? `TXN${Date.now()}` : null
+                    status: paymentMethod === 'cod' ? 'pending' : 'pending', // Will be updated after payment
+                    transactionId: null // Will be set after payment
                 }
             };
 
             console.log("Creating order with data:", orderData);
+            console.log("Cart items before mapping:", cart.items);
 
-            // Save order to database
+            // Create order first
             const response = await api.post('/orders', orderData);
             
             console.log("API Response:", response);
             
             if (response.data && response.data.success) {
                 console.log("Order created successfully:", response.data.order);
+                setCreatedOrder(response.data.order);
                 
-                // Clear the cart
-                dispatch(clearCart());
-                
-                // Show success message with order number
-                alert(`🎉 Order Placed Successfully!\n\nOrder Number: ${response.data.order.orderNumber}\n\nThank you for shopping with Snapdeal!`);
-                
-                // Reset all states
-                setCurrentStep(1);
-                setOtp("");
-                setAddress({
-                    fullName: "",
-                    addressLine1: "",
-                    addressLine2: "",
-                    city: "",
-                    state: "",
-                    pincode: "",
-                    phone: ""
-                });
-                setPaymentMethod("");
-                setCardDetails({
-                    cardNumber: "",
-                    expiryMonth: "",
-                    expiryYear: "",
-                    cvv: "",
-                    cardholderName: ""
-                });
-                
-                // Close popup and navigate
-                if (onPaymentSuccess) {
-                    onPaymentSuccess();
+                if (paymentMethod === 'cod') {
+                    // For COD, complete the order immediately
+                    await completeOrder(response.data.order);
+                } else {
+                    // For online payment, initiate Razorpay
+                    await initiateRazorpayPayment(response.data.order);
                 }
-                navigate('/my-orders');
                 
             } else {
                 throw new Error(response.data.message || 'Failed to create order');
             }
             
         } catch (error) {
-            console.error("Error creating order:", error);
+            console.error("Error processing order:", error);
             alert("Failed to place order. Please try again.");
+            setIsProcessing(false);
+        }
+    };
+
+    const completeOrder = async (order) => {
+        try {
+            // Clear the cart only if this was a cart purchase (not buyNow)
+            if (!buyNowProduct) {
+                dispatch(clearCart());
+            }
+            
+            // Show success message with order number
+            alert(`🎉 Order Placed Successfully!\n\nOrder Number: ${order.orderNumber}\n\nThank you for shopping with Snapdeal!`);
+            
+            // Reset all states
+            resetForm();
+            
+            // Close popup and navigate
+            if (onPaymentSuccess) {
+                onPaymentSuccess();
+            }
+            navigate('/my-orders');
+            
+        } catch (error) {
+            console.error("Error completing order:", error);
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const initiateRazorpayPayment = async (order) => {
+        try {
+            const amount = parseFloat(orderTotal.replace(/,/g, ''));
+            
+            await initiatePayment({
+                amount,
+                orderNumber: order.orderNumber,
+                customerName: address.fullName,
+                customerEmail: "", // Add email if available
+                customerPhone: mobileNumber,
+                onSuccess: async (paymentResponse) => {
+                    console.log("Razorpay payment successful:", paymentResponse);
+                    await completeOrder(order);
+                },
+                onFailure: (error) => {
+                    console.error("Razorpay payment failed:", error);
+                    alert("Payment failed. Please try again or choose Cash on Delivery.");
+                    setIsProcessing(false);
+                }
+            });
+            
+        } catch (error) {
+            console.error("Error initiating Razorpay payment:", error);
+            alert("Failed to initiate payment. Please try again.");
+            setIsProcessing(false);
+        }
+    };
+
+    const resetForm = () => {
+        setCurrentStep(1);
+        setOtp("");
+        setAddress({
+            fullName: "",
+            addressLine1: "",
+            addressLine2: "",
+            city: "",
+            state: "",
+            pincode: "",
+            phone: ""
+        });
+        setPaymentMethod("");
+        setCardDetails({
+            cardNumber: "",
+            expiryMonth: "",
+            expiryYear: "",
+            cvv: "",
+            cardholderName: ""
+        });
+        setCreatedOrder(null);
     };
 
     if (!isOpen) return null;
@@ -272,7 +356,11 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
                             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                                 <div className="flex items-center gap-2 text-green-800">
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-800"></div>
-                                    <span className="text-sm font-medium">Processing your payment...</span>
+                                    <span className="text-sm font-medium">
+                                        {paymentMethod === 'cod' ? 'Processing your order...' : 
+                                         paymentMethod === 'online' ? 'Redirecting to payment gateway...' :
+                                         'Processing your order...'}
+                                    </span>
                                 </div>
                             </div>
                         )}
@@ -434,71 +522,40 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
                                                 <input
                                                     type="radio"
                                                     name="paymentMethod"
-                                                    value="card"
-                                                    checked={paymentMethod === "card"}
+                                                    value="online"
+                                                    checked={paymentMethod === "online"}
                                                     onChange={(e) => setPaymentMethod(e.target.value)}
                                                     className="mr-3"
                                                 />
                                                 <div className="flex items-center gap-2">
                                                     <i className="fas fa-credit-card text-blue-600"></i>
-                                                    <span>Credit/Debit Card</span>
+                                                    <span>Pay Online (UPI, Cards, Net Banking)</span>
+                                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Secured by Razorpay</span>
                                                 </div>
                                             </label>
                                         </div>
 
-                                        {/* Card Details (if card is selected) */}
-                                        {paymentMethod === "card" && (
-                                            <div className="mt-4 p-4 bg-gray-50 rounded space-y-3">
-                                                <h4 className="font-medium text-gray-700">Card Details</h4>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Card Number"
-                                                        value={cardDetails.cardNumber}
-                                                        onChange={(e) => setCardDetails({...cardDetails, cardNumber: e.target.value})}
-                                                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#e40046]"
-                                                        maxLength="16"
-                                                    />
-                                                </div>
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    <select
-                                                        value={cardDetails.expiryMonth}
-                                                        onChange={(e) => setCardDetails({...cardDetails, expiryMonth: e.target.value})}
-                                                        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#e40046]"
-                                                    >
-                                                        <option value="">Month</option>
-                                                        {[...Array(12)].map((_, i) => (
-                                                            <option key={i+1} value={i+1}>{String(i+1).padStart(2, '0')}</option>
-                                                        ))}
-                                                    </select>
-                                                    <select
-                                                        value={cardDetails.expiryYear}
-                                                        onChange={(e) => setCardDetails({...cardDetails, expiryYear: e.target.value})}
-                                                        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#e40046]"
-                                                    >
-                                                        <option value="">Year</option>
-                                                        {[...Array(10)].map((_, i) => {
-                                                            const year = new Date().getFullYear() + i;
-                                                            return <option key={year} value={year}>{year}</option>;
-                                                        })}
-                                                    </select>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="CVV"
-                                                        value={cardDetails.cvv}
-                                                        onChange={(e) => setCardDetails({...cardDetails, cvv: e.target.value})}
-                                                        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#e40046]"
-                                                        maxLength="3"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Cardholder Name"
-                                                        value={cardDetails.cardholderName}
-                                                        onChange={(e) => setCardDetails({...cardDetails, cardholderName: e.target.value})}
-                                                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-[#e40046]"
-                                                    />
+                                        {/* Payment Info */}
+                                        {paymentMethod === "online" && (
+                                            <div className="mt-4 p-4 bg-blue-50 rounded space-y-2">
+                                                <h4 className="font-medium text-blue-800">Online Payment Features:</h4>
+                                                <div className="text-sm text-blue-700 space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <i className="fas fa-check-circle text-green-600"></i>
+                                                        <span>UPI (PhonePe, Google Pay, Paytm)</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <i className="fas fa-check-circle text-green-600"></i>
+                                                        <span>Credit/Debit Cards</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <i className="fas fa-check-circle text-green-600"></i>
+                                                        <span>Net Banking</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <i className="fas fa-shield-alt text-green-600"></i>
+                                                        <span>100% Secure & Encrypted</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}

@@ -14,6 +14,15 @@ export const createOrder = async (req, res) => {
             paymentInfo
         } = req.body;
 
+        // Check if items array is empty
+        if (!items || items.length === 0) {
+            console.log("Order creation failed: No items in the order");
+            return res.status(400).json({
+                success: false,
+                message: 'Order must contain at least one item'
+            });
+        }
+
         // Validate items and get product details
         const validatedItems = await Promise.all(
             items.map(async (item) => {
