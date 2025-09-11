@@ -31,7 +31,7 @@ function Navbar() {
               alt="Snapdeal"
               title="Snapdeal"
               className="h-8"
-            />
+            />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
           </Link>
         </div>
 
@@ -74,7 +74,7 @@ function Navbar() {
               </div>
               <div className="absolute right-0 mt-2 w-48 bg-[#333333] text-white rounded shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                 <div className="p-3 border-b border-gray-600">
-                  <p className="hover:bg-black px-2 py-1 rounded">Orders</p>
+                  <Link to="/my-orders"><p className="hover:bg-black px-2 py-1 rounded">Orders</p></Link> 
                   <p className="hover:bg-black px-2 py-1 rounded">
                     E-Gift Voucher
                   </p>
@@ -96,7 +96,7 @@ function Navbar() {
           ) : (
             <>
               <div className="flex items-center gap-4">
-                {/* Admin Link */}
+                
                
                 
                 <div className="flex items-center gap-2 text-[13px] cursor-pointer text-white">
@@ -104,10 +104,22 @@ function Navbar() {
                   <img src={signin} alt="Sign In" className="h-5 w-6" />
                 </div>
               </div>
-              <div className="absolute right-0 mt-2 w-48 bg-[#333333] text-white rounded shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              <div className="absolute right-0 mt-2 w-48 bg-[#333333] text-white rounded shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 cursor-pointer">
                 <div className="p-3 border-b border-gray-600">
                   <p className="hover:bg-black px-2 py-1 rounded">Your Account</p>
-                  <p className="hover:bg-black px-2 py-1 rounded">Your Orders</p>
+                  <p 
+                    className="hover:bg-black px-2 py-1 rounded"
+                    onClick={() => {
+                      const token = localStorage.getItem('token');
+                      if (token) {
+                        navigate('/my-orders');
+                      } else {
+                        setShowLogin(true);
+                      }
+                    }}
+                  >
+                    Your Orders
+                  </p>
                 </div>
                 <div className="p-3 text-center">
                   <p className="text-[11px]">If you are a new user</p>

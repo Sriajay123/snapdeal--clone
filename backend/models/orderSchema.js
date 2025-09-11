@@ -120,11 +120,25 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Generate order number before saving
-orderSchema.pre('save', function(next) {
-    if (!this.orderNumber) {
-        const timestamp = Date.now().toString();
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        this.orderNumber = `SD${timestamp.slice(-6)}${random}`;
+orderSchema.pre('save', async function(next) {
+    if (this.isNew && !this.orderNumber) {
+        let isUnique = false;
+        let orderNumber;
+        
+        // Generate unique order number
+        while (!isUnique) {
+            const timestamp = Date.now().toString();
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            orderNumber = `SD${timestamp.slice(-8)}${random}`;
+            
+            // Check if this order number already exists
+            const existingOrder = await mongoose.model('Order').findOne({ orderNumber });
+            if (!existingOrder) {
+                isUnique = true;
+            }
+        }
+        
+        this.orderNumber = orderNumber;
     }
     next();
 });

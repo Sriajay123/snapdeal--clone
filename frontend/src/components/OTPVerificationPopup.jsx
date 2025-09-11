@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../store/cartSlice";
+import api from "../api/api";
 
 function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const cart = useSelector((state) => state.cart);
     const [currentStep, setCurrentStep] = useState(1); // 1: OTP, 2: Address, 3: Payment
     const [isProcessing, setIsProcessing] = useState(false);
     
@@ -77,7 +79,7 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
         setCurrentStep(3); // Move to payment step
     };
 
-    const handlePaymentContinue = () => {
+    const handlePaymentContinue = async () => {
         if (!paymentMethod) {
             alert("Please select a payment method");
             return;
@@ -92,42 +94,92 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal })
         setIsProcessing(true);
         console.log("Processing payment with method:", paymentMethod);
         
-        // Simulate payment processing
-        setTimeout(() => {
-            // Clear the cart
-            dispatch(clearCart());
+        try {
+            // Prepare order data
+            const orderData = {
+                customerInfo: {
+                    name: address.fullName,
+                    phone: mobileNumber,
+                    email: "" // Could add email field if needed
+                },
+                shippingAddress: address,
+                items: cart.items.map(item => ({
+                    product: item.product._id, // MongoDB ObjectId reference
+                    productDetails: {
+                        name: item.product.name,
+                        brand: item.product.brand || "",
+                        price: item.product.price,
+                        image: item.product.image,
+                        selectedSize: item.selectedSize || "",
+                        selectedColor: item.selectedColor || ""
+                    },
+                    quantity: item.quantity,
+                    price: item.product.price
+                })),
+                orderSummary: {
+                    subtotal: parseFloat(orderTotal.replace(/,/g, '')),
+                    deliveryCharges: 0,
+                    totalAmount: parseFloat(orderTotal.replace(/,/g, ''))
+                },
+                paymentInfo: {
+                    method: paymentMethod,
+                    transactionId: paymentMethod === "card" ? `TXN${Date.now()}` : null
+                }
+            };
+
+            console.log("Creating order with data:", orderData);
+
+            // Save order to database
+            const response = await api.post('/orders', orderData);
             
-            // Show success message
-            alert("🎉 Payment Successful!\n\nYour order has been placed successfully. Thank you for shopping with Snapdeal!");
+            console.log("API Response:", response);
             
-            // Reset all states
-            setIsProcessing(false);
-            setCurrentStep(1);
-            setOtp("");
-            setAddress({
-                fullName: "",
-                addressLine1: "",
-                addressLine2: "",
-                city: "",
-                state: "",
-                pincode: "",
-                phone: ""
-            });
-            setPaymentMethod("");
-            setCardDetails({
-                cardNumber: "",
-                expiryMonth: "",
-                expiryYear: "",
-                cvv: "",
-                cardholderName: ""
-            });
-            
-            // Close popup and navigate
-            if (onPaymentSuccess) {
-                onPaymentSuccess();
+            if (response.data && response.data.success) {
+                console.log("Order created successfully:", response.data.order);
+                
+                // Clear the cart
+                dispatch(clearCart());
+                
+                // Show success message with order number
+                alert(`🎉 Order Placed Successfully!\n\nOrder Number: ${response.data.order.orderNumber}\n\nThank you for shopping with Snapdeal!`);
+                
+                // Reset all states
+                setCurrentStep(1);
+                setOtp("");
+                setAddress({
+                    fullName: "",
+                    addressLine1: "",
+                    addressLine2: "",
+                    city: "",
+                    state: "",
+                    pincode: "",
+                    phone: ""
+                });
+                setPaymentMethod("");
+                setCardDetails({
+                    cardNumber: "",
+                    expiryMonth: "",
+                    expiryYear: "",
+                    cvv: "",
+                    cardholderName: ""
+                });
+                
+                // Close popup and navigate
+                if (onPaymentSuccess) {
+                    onPaymentSuccess();
+                }
+                navigate('/my-orders');
+                
+            } else {
+                throw new Error(response.data.message || 'Failed to create order');
             }
-            navigate('/');
-        }, 3000);
+            
+        } catch (error) {
+            console.error("Error creating order:", error);
+            alert("Failed to place order. Please try again.");
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     if (!isOpen) return null;
