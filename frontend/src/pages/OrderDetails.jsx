@@ -73,12 +73,33 @@ function OrderDetails() {
     };
 
     const calculateTotal = () => {
-        if (!order || !order.items) return 993;
+        if (!order) return 0;
+        
+        // Use order summary if available, otherwise calculate from items
+        if (order.orderSummary?.totalAmount) {
+            return order.orderSummary.totalAmount;
+        }
+        
+        if (!order.items) return 0;
         return order.items.reduce((total, item) => {
-            const price = item?.productDetails?.price || item?.product?.price || 855;
+            const price = item?.productDetails?.price || item?.product?.price || 0;
             const quantity = item?.quantity || 1;
             return total + (price * quantity);
         }, 0);
+    };
+
+    const getDeliveryCharges = () => {
+        if (order?.orderSummary?.deliveryCharges !== undefined) {
+            return order.orderSummary.deliveryCharges;
+        }
+        return 0; // Default to free delivery
+    };
+
+    const getSubtotal = () => {
+        if (order?.orderSummary?.subtotal) {
+            return order.orderSummary.subtotal;
+        }
+        return calculateTotal() - getDeliveryCharges();
     };
 
     if (loading) {
@@ -162,8 +183,10 @@ function OrderDetails() {
                             {/* Customer Information */}
                             <div>
                                 <h3 className="text-base font-semibold text-gray-800 mb-3">Customer Information</h3>
-                                <div className="text-sm text-gray-600">
-                                    Email: <span className="text-gray-800">{order.customerEmail || 'sriajaysnipni047@gmail.com'}</span>
+                                <div className="text-sm text-gray-600 space-y-1">
+                                    <div>Name: <span className="text-gray-800">{order.customerInfo?.name || order.customerName || 'Name not available'}</span></div>
+                                    <div>Email: <span className="text-gray-800">{order.customerInfo?.email || order.customerEmail || 'Email not available'}</span></div>
+                                    <div>Phone: <span className="text-gray-800">{order.customerInfo?.phone || order.customerPhone || 'Phone not available'}</span></div>
                                 </div>
                             </div>
 
@@ -171,24 +194,43 @@ function OrderDetails() {
                             <div>
                                 <h3 className="text-base font-semibold text-gray-800 mb-3">Payment Method</h3>
                                 <div className="text-sm text-gray-800">
-                                    {order.paymentMethod || 'Cash on Delivery'}
+                                    {order.paymentInfo?.method === 'cod' ? 'Cash on Delivery' :
+                                     order.paymentInfo?.method === 'card' ? 'Credit/Debit Card' :
+                                     order.paymentInfo?.method === 'upi' ? 'UPI' :
+                                     order.paymentInfo?.method === 'netbanking' ? 'Net Banking' :
+                                     order.paymentInfo?.method === 'online' ? 'Online Payment' :
+                                     order.paymentMethod || 'Cash on Delivery'}
                                 </div>
+                                {order.paymentInfo?.status && (
+                                    <div className="text-xs text-gray-600 mt-1">
+                                        Status: <span className={`font-medium ${
+                                            order.paymentInfo.status === 'completed' ? 'text-green-600' :
+                                            order.paymentInfo.status === 'pending' ? 'text-yellow-600' :
+                                            order.paymentInfo.status === 'failed' ? 'text-red-600' :
+                                            'text-gray-600'
+                                        }`}>
+                                            {order.paymentInfo.status.charAt(0).toUpperCase() + order.paymentInfo.status.slice(1)}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Order Summary */}
                             <div className="text-right">
                                 <div className="space-y-1">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-sm text-gray-600">Total</span>
-                                        <span className="text-lg font-bold text-gray-800">Rs. {calculateTotal()}</span>
+                                        <span className="text-sm text-gray-600">Subtotal</span>
+                                        <span className="text-sm font-medium text-gray-800">Rs. {getSubtotal()}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-600">Delivery Charges</span>
-                                        <span className="text-sm font-semibold text-green-600">FREE</span>
+                                        <span className={`text-sm font-semibold ${getDeliveryCharges() === 0 ? 'text-green-600' : 'text-gray-800'}`}>
+                                            {getDeliveryCharges() === 0 ? 'FREE' : `Rs. ${getDeliveryCharges()}`}
+                                        </span>
                                     </div>
                                     <div className="border-t border-gray-300 pt-2 mt-2">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-sm font-semibold text-gray-800">Payable Amount</span>
+                                            <span className="text-sm font-semibold text-gray-800">Total Amount</span>
                                             <span className="text-lg font-bold text-gray-800">Rs. {calculateTotal()}</span>
                                         </div>
                                     </div>
@@ -202,7 +244,7 @@ function OrderDetails() {
                                 <div key={index} className="border border-gray-300 rounded-lg p-6">
                                     {/* Suborder ID */}
                                     <div className="text-sm text-gray-600 mb-4">
-                                        Suborder Id: <span className="font-medium text-gray-800">66649697423</span>
+                                        Suborder Id: <span className="font-medium text-gray-800">{order.orderNumber}</span>
                                     </div>
                                     
                                     {/* Product Row */}
@@ -314,16 +356,19 @@ function OrderDetails() {
                             <h3 className="text-base font-semibold text-gray-800 mb-4">Shipping Information</h3>
                             <div className="text-sm">
                                 <div className="font-medium text-gray-800 mb-2">
-                                    {order.customerName || 'Sriajay S'}
+                                    {order.shippingAddress?.fullName || order.customerInfo?.name || order.customerName || 'Name not available'}
                                 </div>
                                 <div className="text-gray-600 mb-2">
-                                    Rajajinagar, Male, Bangalore Urban - 560010, Raichur
+                                    {order.shippingAddress?.addressLine1 || 'Address not available'}
+                                    {order.shippingAddress?.addressLine2 && `, ${order.shippingAddress.addressLine2}`}
                                 </div>
                                 <div className="text-gray-600 mb-2">
-                                    KARNATAKA - 584128
+                                    {order.shippingAddress?.city || 'City not available'}, {order.shippingAddress?.state || 'State not available'} - {order.shippingAddress?.pincode || 'Pincode not available'}
                                 </div>
                                 <div className="text-gray-600">
-                                    Mobile No: <span className="font-medium text-gray-800">{order.customerPhone || '9591933353'}</span>
+                                    Mobile No: <span className="font-medium text-gray-800">
+                                        {order.shippingAddress?.phone || order.customerInfo?.phone || order.customerPhone || 'Phone not available'}
+                                    </span>
                                 </div>
                             </div>
                         </div>

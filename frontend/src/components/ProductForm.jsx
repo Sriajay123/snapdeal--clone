@@ -122,9 +122,11 @@ function ProductForm({ product, onClose, onSave }) {
     const handleCategoryChange = (e) => {
         const value = e.target.value;
         if (value === "custom") {
-            setCustomCategory("");
+            // Set to custom mode and clear the category
+            setCustomCategory("custom");
             setFormData({ ...formData, category: "" });
         } else {
+            // Set the selected predefined category
             setCustomCategory(value);
             setFormData({ ...formData, category: value });
         }
@@ -132,7 +134,7 @@ function ProductForm({ product, onClose, onSave }) {
 
     const handleCustomCategoryChange = (e) => {
         const value = e.target.value;
-        setCustomCategory(value);
+        // Update the form data category with the custom value
         setFormData({ ...formData, category: value });
     };
 
@@ -319,13 +321,14 @@ function ProductForm({ product, onClose, onSave }) {
                                     <option value="books">Books</option>
                                     <option value="custom">Custom Category</option>
                                 </select>
-                                {customCategory === "" && (
+                                {customCategory === "custom" && (
                                     <input
                                         type="text"
                                         placeholder="Enter custom category"
                                         value={formData.category}
                                         onChange={handleCustomCategoryChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e40046] focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-yellow-400 bg-yellow-50 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e40046] focus:border-transparent"
+                                        autoFocus
                                         required
                                     />
                                 )}
