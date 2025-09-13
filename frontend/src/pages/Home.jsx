@@ -9,7 +9,9 @@ import Header from '../components/Header'
 import TrendingProducts from '../components/TrendingProducts'
 import RecentlyViewedProducts from '../components/RecentlyViewedProducts'
 import Banner from '../components/Banner'
-
+import CustomerTrustSection from '../components/CustomerTrustSection'
+import ContentFooter from '../components/ContentFooter'
+import PaymentFooter from '../components/PaymentFooter'
 
 function Home() { 
   
@@ -30,7 +32,10 @@ function Home() {
       </div>
       <TrendingProducts className="mt-[50px]" />
       <Banner/>
-      
+      <CustomerTrustSection />
+      <ContentFooter />
+      <PaymentFooter/>
+   
     </div>
   )
 
