@@ -12,7 +12,7 @@ import Banner from '../components/Banner'
 import CustomerTrustSection from '../components/CustomerTrustSection'
 import ContentFooter from '../components/ContentFooter'
 import PaymentFooter from '../components/PaymentFooter'
-
+import Footer from '../components/Footer'
 function Home() { 
   
   
@@ -35,6 +35,7 @@ function Home() {
       <CustomerTrustSection />
       <ContentFooter />
       <PaymentFooter/>
+      <Footer/>
    
     </div>
   )
