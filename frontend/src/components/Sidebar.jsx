@@ -1,76 +1,466 @@
-
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import qrcode from '../assets/qrcode.png'
+import mens from '../assets/mens.jpg'
+import womens from '../assets/women.jpg'
+import beauty from '../assets/sidebeauty.jpg'
+import toy from '../assets/toy.jpg'
+
+// Category data structure based on the image
+const categoryData = {
+  "Men's Fashion": {
+    "FOOTWEAR": [
+      "Sports Shoes", "Casual Shoes", "Slippers & Flip Flops", "Sandals & Floaters", "Formal Shoes",
+      "Loafers", "Sneakers", "Ethnic Footwear", "Shoe Accessories", "View All"
+    ],
+    "BAGS & LUGGAGE": [
+      "Backpacks", "Laptop Bags", "Hiking Bags", "Luggage & Suitcases", "Travel Accessories", "Office Bags", "View All"
+    ],
+    "CLOTHING": [
+      "T-Shirts & Polos", "Shirts", "Jeans", "Trousers & Chinos", "Innerwear & Sleepwear", "View All"
+    ],
+    "WINTER WEAR": [
+      "Jackets", "Sweatshirts", "Sweaters", "Thermals"
+    ],
+    "SPORTSWEAR": [
+      "T-Shirts & Polos", "Trackpants & Tracksuits", "View All"
+    ],
+    "MEN'S GROOMING": [
+      "Shaving Creams & Gels"
+    ],
+    "EYEWEAR": [
+      "Sunglasses", "View All"
+    ],
+    "WATCHES": [],
+    "JEWELLERY & CUFFLINKS": [],
+    "ACCESSORIES": [
+      "Wallets", "Belts", "Hats & Caps", "Gift Sets", "Neckties & Cravats",
+      "Card Holders", "Keychains", "Suspenders", "View All"
+    ]
+  },
+
+  "Women's Fashion": {
+    "ETHNIC WEAR": [
+      "Sarees", "Kurtas & Kurtis", "Lehengas", "Salwar Suits", "Ethnic Bottomwear", "Saree Blouses", "View All"
+    ],
+    "FOOTWEAR": [
+      "Heels", "Flats & Sandals", "Slippers & Flip Flops", "Ballerinas", "Casual Shoes", "Sports Shoes", "Ethnic Footwear", "Floater Sandal", "View All"
+    ],
+    "PERFUMES & FRAGRANCES": [
+      "Perfumes", "Deodorants"
+    ],
+    "WOMEN'S CLOTHING": [
+      "Dresses & Gowns", "Tops & Tunics", "T-Shirts", "Shirts", "Jeans",
+      "Trousers", "Innerwear", "Nightwear", "Sportswear & Gymwear", "View All"
+    ],
+    "WINTER WEAR": [
+      "Outerwear & Jackets", "Sweatshirts", "Cardigans & Pullovers", "Shrugs & Waistcoats"
+    ],
+    "MATERNITY WEAR": [],
+    "HANDBAGS & CLUTCHES": [
+      "Handbags", "Wallets", "Clutches", "Utility bags", "Eyewear", "Sunglasses", "Spectacle Frames", "Watches",
+      "Fashion Jewellery", "Necklaces & Sets", "Earrings", "Bangles & Bracelets", "Pendants & Sets", "View All"
+    ],
+    "GOLD COINS & BARS": [],
+    "FASHION ACCESSORIES": [
+      "Hair Accessories", "Stoles & Scarves", "Socks & Stockings", "View All"
+    ]
+  },
+
+  "Home & Kitchen": {
+    "KITCHEN APPLIANCES": [
+      "Juicer Mixer Grinders", "Water Purifiers", "Gas Stoves & Hobs", "Induction Cooktops", "Kettles & Coffee Makers",
+      "Choppers & Blenders", "Sandwich Makers", "Roti Makers", "Electric Cookers", "View All"
+    ],
+    "KITCHENWARE": [
+      "Cookware & Bakeware", "Kitchen Storage", "Dining & Serving", "Kitchen Tools", "Pressure Cookers",
+      "Water Bottles", "Tea & Coffeeware", "Bar Accessories", "View All"
+    ],
+    "HOME FURNISHING": [
+      "Bed Linen", "Bath Linen", "Blankets & Quilts", "Curtains & Accessories", "Mattresses", "View All"
+    ],
+    "HOME DÉCOR": [
+      "Lighting Fixtures", "Wall Decor", "Gifts & Decor", "Religion & Spirituality", "LED Bulbs", "View All"
+    ],
+    "HOME IMPROVEMENT": [
+      "Home Utility", "Cleaning Mops", "Plants & Gardening", "Ironing Boards", "Home Cleaning", "Laundry Accessories", "View All"
+    ],
+    "TOOLS & HARDWARE": [
+      "Power & Hand Tools", "Bathroom Accessories", "Electrical", "Taps & Showers", "Safes Lock & Door Fitting", "Sanitaryware", "View All"
+    ],
+    "PET SUPPLIES": [
+      "Dog Supplies", "Cat Supplies", "Fish & Aquatic Supplies", "Bird Supplies", "View All"
+    ]
+  },
+
+  "Toys, Kids' Fashion & More": {
+    "TOYS": [
+      "Toy Cars", "Electronic Toys", "Action Toys & Figures", "Ride On & Scooters", "Outdoor Toys", "Soft Toys",
+      "Educational Toys", "Toddler Toys", "Dolls & Doll Houses", "Activity Sets", "Indoor & Board Games", "Party Supplies", "Bicycles & Tricycles"
+    ],
+    "KIDS' FOOTWEAR": [
+      "Boys Footwear", "Girls Footwear", "Baby Footwear"
+    ],
+    "KIDS EYEWEAR": [],
+    "KIDS' WATCHES": [],
+    "KIDS' FASHION": [
+      "Girls' Clothing", "Girls Clothing Sets", "Frocks & Dresses", "T-Shirts, Tops & Shirts", "Jumpsuits & Dungarees",
+      "Girls Sweatshirts", "Girls Jackets", "Girls Jeans", "Boys' Clothing", "Boys Clothing Sets", "Boys Tshirt & Polos",
+      "Boys Shirt", "Boys Trackpant", "Boys Jeans", "Boys Sweatshirts", "Baby Clothing", "Baby Boys & Girls Sets",
+      "Baby T-Shirt, Tops&Shirts", "Baby Girl Frock, &Dresses"
+    ],
+    "KIDS ACCESSORIES": [],
+    "BABY CARE": [
+      "Baby Mosquito Nets", "Baby Blankets", "Baby Carriers", "Baby Strollers", "Walkers", "Feeding & Nursing"
+    ],
+    "LAB EQUIPMENT": [],
+    "STATIONERY": [
+      "Pens & Markers", "Pencil Boxes", "Files & Folders", "Calculators", "Diaries & Planners", "Printing Papers", "Notebooks", "Writing Pads", "Photo Papers"
+    ],
+    "ART & CRAFT SUPPLIES": [
+      "Tapes", "Card Holders", "Staplers"
+    ]
+  },
+
+  "Beauty, Health & Daily Care": {
+    "BEAUTY": [
+      "Face", "Eyes", "Lips", "Nails", "Makeup Palettes", "Brushes & Applicators"
+    ],
+    "PERSONAL CARE & GROOMING": [
+      "Skin Care", "Hair Care", "Bath & Shower", "Oral Care", "Men's Grooming", "Feminine Hygiene", "Waxing & Hair Removal", "Deodorants & Roll-ons"
+    ],
+    "SEXUAL WELLNESS": [
+      "Condoms", "Lubes", "Adult Sex Toys", "Performance & Enlargement", "Sexy Lingerie"
+    ],
+    "FOOD AND GOURMET": [
+      "Tea, Coffee & Beverages", "Noodles, Soups & Pastas", "Biscuits", "Breakfast Foods", "Ready To Cook & Eat",
+      "Sauces & Dressings", "Baking Essentials", "Chocolates & Candies", "Staples, Oils & Spices", "Dry Fruits & Gifts Boxes"
+    ],
+    "NUTRITION & SUPPLEMENTS": [
+      "Proteins", "Vitamins & Minerals", "Health Drinks", "Meal Replacements", "Weight Gainers", "Workout Supplements", "Muscle Support"
+    ],
+    "HEALTH MONITORING DEVICES": [
+      "BP Monitors", "Diabetic Care", "Weighing Scales", "Body Fat Analysers", "Respiratory & Heart Care", "Thermometers"
+    ],
+    "GENERAL WELLNESS": [
+      "Massagers & Pain Relief", "Mobility Rehabilitation", "First Aid", "Nicotine Gums"
+    ],
+    "BABY CARE": [
+      "Diapers & Potty Training", "Bath, Skin & Health Care", "Baby Food"
+    ],
+    "HOUSEHOLD ESSENTIALS": [
+      "Detergents & Fabric Care", "House & Kitchen Cleaners", "Repellents", "Air Fresheners"
+    ]
+  }
+};
 
 function Sidebar() {
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+
+  // Handle mouse enter with no delay
+  const handleMouseEnter = (category) => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setHoveredCategory(category);
+  };
+
+  // Handle mouse leave with delay to prevent flickering
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setHoveredCategory(null);
+    }, 150); // 150ms delay before closing
+    setHoverTimeout(timeout);
+  };
+
+  // Handle popup mouse enter (cancel closing)
+  const handlePopupMouseEnter = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+  };
+
   return (
+    <div className="relative">
+      {/* Main Sidebar */}
+      <div className="w-[230px] h-auto ml-[40px] bg-white border border-gray-200 shadow-sm">
+        
+        {/* TOP CATEGORIES Section */}
+        <div className="pt-3 pl-4 pb-1">
+          <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wider">TOP CATEGORIES</span>
+        </div>
+        
+        <div className="flex flex-col text-[12px] text-gray-600 px-4 pb-4 space-y-1">
+          {/* Men's Fashion */}
+          <div
+            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            onMouseEnter={() => handleMouseEnter("Men's Fashion")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src="https://g.sdlcdn.com/imgs/k/v/x/Men_sitenavigation-b972a.jpg" 
+              className="w-6 h-6 rounded-full object-cover" 
+              alt="Men's Fashion"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face";
+              }}
+            />
+            <span>Men's Fashion</span>
+          </div>
 
-    <div className="w-[230px] h-[625px] ml-[80px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm">
+          {/* Women's Fashion */}
+          <div
+            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            onMouseEnter={() => handleMouseEnter("Women's Fashion")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src="https://g.sdlcdn.com/imgs/k/v/x/WoMen_sitenav-5a8ca.jpg" 
+              className="w-6 h-6 rounded-full object-cover" 
+              alt="Women's Fashion"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1494790108755-2616c4e69bdc?w=50&h=50&fit=crop&crop=face";
+              }}
+            />
+            <span>Women's Fashion</span>
+          </div>
 
-      <div className="pt-2 pl-6">
-        <span className="text-[11px] text-[#333333] ">TOP CATEGORIES</span>
-      </div>
-      <div className="flex flex-col text-[12px] text-[#666666] pt-2 pl-4 pb-[30px] space-y-2">
-        <span className="inline-flex items-center gap-2">
-          <img src="https://g.sdlcdn.com/imgs/k/v/x/Men_sitenavigation-b972a.jpg" className="w-7 h-7" alt="Men's Fashion " />
-          Men's Fashion
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <img src="https://g.sdlcdn.com/imgs/k/v/x/WoMen_sitenav-5a8ca.jpg" className="w-7 h-7" alt="Women'sFashion" />
-          Women'sFashion
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <img src="https://g.sdlcdn.com/imgs/k/v/x/HOme_sitenavigation-d7a00.jpg" className="w-7 h-7" alt="Home" />
-          Home & Kitchen
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <img src="https://g.sdlcdn.com/imgs/k/v/x/Toys_Sitenavigation-ef666.jpg" className="w-7 h-7" alt="Toys,Kids Fashion &m..." />
-          Toys,Kids Fashion &m...
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <img src="https://g.sdlcdn.com/imgs/k/v/x/Beauty_Site_navigation-5f3be.jpg" className="w-7 h-7" alt="Beauty" />
-          Beauty, Health & Daily...
-        </span>
+          {/* Home & Kitchen */}
+          <div 
+            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            onMouseEnter={() => handleMouseEnter("Home & Kitchen")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src="https://g.sdlcdn.com/imgs/k/v/x/HOme_sitenavigation-d7a00.jpg" 
+              className="w-6 h-6 rounded-full object-cover" 
+              alt="Home & Kitchen"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=50&h=50&fit=crop";
+              }}
+            />
+            <span>Home & Kitchen</span>
+          </div>
 
-      </div>
-      <div className="pt-2 pl-6">
-        <span className="text-[11px] text-[#333333] ">More Categories</span>
-      </div>
-      <div className="flex flex-col text-[12px] text-[#666666] pt-2 pl-4  space-y-3 ml-2">
-        <span> Automotives</span>
-        <span >Women'sFashion</span>
-        <span>Home & Kitchen</span>
-        <span >Toys,Kids Fashion &m...</span>
-        <span >Beauty,Health&Daily...</span>
-      </div>
+          {/* Toys, Kids' Fashion & More */}
+          <div 
+            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            onMouseEnter={() => handleMouseEnter("Toys, Kids' Fashion & More")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src="https://g.sdlcdn.com/imgs/k/v/x/Toys_Sitenavigation-ef666.jpg" 
+              className="w-6 h-6 rounded-full object-cover" 
+              alt="Toys, Kids' Fashion & More"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=50&h=50&fit=crop";
+              }}
+            />
+            <span>Toys, Kids' Fashion & More</span>
+          </div>
 
-      <div className="pt-4 pl-6">
-        <span className="text-[11px] text-[#333333] ">Trending Searches</span>
-      </div>
-
-      <div className="flex flex-col text-[12px] text-[#666666] pt-2 pl-4  space-y-3 ml-2">
-
-        <span className="cursor-pointer"><i className="fa-solid fa-search text-white-300 text-md mr-2"></i>Kitchen Product</span>
-        <span className="cursor-pointer"><i className="fa-solid fa-search text-white-300 text-md mr-2"></i>Shoes For Men</span>
-        <span className="cursor-pointer"><i className="fa-solid fa-search text-white-300 text-md mr-2"></i>Kurti Set</span>
-        <span className="cursor-pointer"><i className="fa-solid fa-search text-white-300 text-md mr-2"></i>Sandal Men</span>
-        <span className="cursor-pointer"><i className="fa-solid fa-search text-white-300 text-md mr-2"></i>Sport Shoe Men</span>
-
-
-      </div>
-     
-        <div className="flex  mt-20"> 
-          <img src={qrcode} alt="qr code" className="w-20 h-20" />
-           <div>
-            <p className="text-[13px] mt-2 mb-1">Enjoy Convenient Order Tracking</p>
-            <span className="text-[10px] ">scan to download app</span>
+          {/* Beauty, Health & Daily Care */}
+          <div 
+            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            onMouseEnter={() => handleMouseEnter("Beauty, Health & Daily Care")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src="https://g.sdlcdn.com/imgs/k/v/x/Beauty_Site_navigation-5f3be.jpg" 
+              className="w-6 h-6 rounded-full object-cover" 
+              alt="Beauty, Health & Daily Care"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=50&h=50&fit=crop";
+              }}
+            />
+            <span>Beauty, Health & Daily Care</span>
           </div>
         </div>
-        <div>
-        
-        </div>
-     
-    </div>
 
+        {/* MORE CATEGORIES Section */}
+        <div className="pt-2 pl-4 pb-1">
+          <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wider">MORE CATEGORIES</span>
+        </div>
+        
+        <div className="flex flex-col text-[12px] text-gray-600 px-4 pb-4 space-y-1">
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Automotives</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Mobile & Accessories</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Electronics</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Sports, Fitness & Outdoor</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Computers & Gaming</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Books, Media & Music</span>
+          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Hobbies</span>
+        </div>
+
+        {/* TRENDING SEARCHES Section */}
+        <div className="pt-2 pl-4 pb-1">
+          <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wider">TRENDING SEARCHES</span>
+        </div>
+
+        <div className="flex flex-col text-[11px] text-gray-500 px-4 pb-4 space-y-1">
+          <span className="flex items-center py-1 cursor-pointer hover:text-[#e31e24] transition-colors">
+            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kitchen Product
+          </span>
+          <span className="flex items-center py-1 cursor-pointer hover:text-[#e31e24] transition-colors">
+            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Shoes For Men
+          </span>
+          <span className="flex items-center py-1 cursor-pointer hover:text-[#e31e24] transition-colors">
+            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kurti Set
+          </span>
+          <span className="flex items-center py-1 cursor-pointer hover:text-[#e31e24] transition-colors">
+            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sandal Men
+          </span>
+          <span className="flex items-center py-1 cursor-pointer hover:text-[#e31e24] transition-colors">
+            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sport Shoe Men
+          </span>
+        </div>
+
+        {/* QR Code Section */}
+        <div className="flex items-center px-4 py-3 border-t border-gray-100">
+          <img src={qrcode} alt="QR Code" className="w-16 h-16 mr-3" />
+          <div className='pb-6'>
+            <p className="text-[11px] font-medium text-gray-700 mb-1">Enjoy Convenient Order Tracking</p>
+            <span className="text-[9px] text-gray-500">scan to download app</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Fixed Hover Dropdown Menu */}
+      {hoveredCategory && categoryData[hoveredCategory] && (
+        <div
+          className="absolute left-[230px] top-0 bg-white border border-gray-200 shadow-xl z-50 w-[700px] min-h-[400px] flex"
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Categories Section */}
+          <div className="flex-1 px-4 py-3">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-4 h-full">
+              {Object.entries(categoryData[hoveredCategory])
+                .filter(([subcategory, items]) => items.length > 0)
+                .map(([subcategory, items], index) => (
+                <div key={index} className="min-w-0">
+                  <h4 className="text-[10px] font-bold text-gray-800 uppercase tracking-wide mb-2 pb-1 border-b border-gray-200 truncate">
+                    {subcategory}
+                  </h4>
+                  <div className="space-y-0.5">
+                    {items.slice(0, 8).map((item, itemIndex) => (
+                      <Link
+                        key={itemIndex}
+                        to={`/category/${encodeURIComponent(item)}`}
+                        className="block text-[10px] text-gray-600 hover:text-[#e31e24] transition-colors py-0.5 leading-tight truncate no-underline"
+                        title={item}
+                      >
+                        {item}
+                      </Link>
+                    ))}
+                    {items.length > 8 && (
+                      <Link
+                        to={`/category/${encodeURIComponent(subcategory)}`}
+                        className="flex items-center text-[10px] text-[#e31e24] font-medium hover:text-red-700 transition-colors py-0.5 no-underline"
+                      >
+                        <span>View All</span>
+                        <span className="ml-1 text-[8px]">›</span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Promotional Image Section */}
+          <div className="w-[180px] bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col justify-center items-center border-l border-gray-200 px-3 py-4">
+            {hoveredCategory === "Men's Fashion" && (
+              <div className="text-center">
+                <img 
+                  src={mens} 
+                  alt="Men's Fashion" 
+                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Men's Fashion</h3>
+                  <p className="text-xs text-gray-600 mb-2">40-80% OFF</p>
+                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
+                    Shop Now
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {hoveredCategory === "Women's Fashion" && (
+              <div className="text-center">
+                <img 
+                  src={womens} 
+                  alt="Women's Fashion" 
+                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Women's Fashion</h3>
+                  <p className="text-xs text-gray-600 mb-2">50-90% OFF</p>
+                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
+                    Shop Now
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {hoveredCategory === "Home & Kitchen" && (
+              <div className="text-center">
+                <img 
+                  src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=300&fit=crop" 
+                  alt="Home & Kitchen" 
+                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Home & Kitchen</h3>
+                  <p className="text-xs text-gray-600 mb-2">Up to 70% OFF</p>
+                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
+                    Shop Now
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {hoveredCategory === "Toys, Kids' Fashion & More" && (
+              <div className="text-center">
+                <img 
+                  src={toy}
+                  alt="Kids Fashion" 
+                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Kids & Toys</h3>
+                  <p className="text-xs text-gray-600 mb-2">Min 40% OFF</p>
+                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
+                    Shop Now
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {hoveredCategory === "Beauty, Health & Daily Care" && (
+              <div className="text-center">
+                <img 
+                  src={beauty}
+                  alt="Beauty Products" 
+                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                />
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Beauty & Health</h3>
+                  <p className="text-xs text-gray-600 mb-2">Up to 60% OFF</p>
+                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
+                    Shop Now
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

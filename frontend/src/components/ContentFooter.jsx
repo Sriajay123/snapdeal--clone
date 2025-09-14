@@ -8,42 +8,48 @@ const contentData = [
       "Terms of Sale", 
       "Terms of Use",
       "Report Abuse & Takedown Policy",
+      "Know Your BIS Standard",
+      "Products Under Cumpulsory BIS",
+      "Certification",
+       "FAQ",
     ],
   },
   {
     heading: "COMPANY",
-    links: ["About Us", "Core Values", "Careers", "Blog", "Sitemap"],
+    links: ["About Us", "Careers", "Blog", "Sitemap","Contact Us"],
   },
   {
     heading: "SNAPDEAL BUSINESS", 
     links: [
       "Shopping App",
       "Sell on Snapdeal",
-      "Advertise on Snapdeal",
+    
       "Media Enquiries", 
-      "Be an Affiliate",
+      
     ],
   },
+
   {
-    heading: "HELP",
+    heading: "POPULAR LINKS",
     links: [
-      "Customer Care",
-      "FAQ",
-      "Track Your Order",
-      "Shipping Info",
-      "Return Policy",
+      "Lehenga",
+      "Kids Clothing",
+      "Sarees",
+      "Winter Wear",
+      "Sweatshirts"
     ],
   },
+  
 ];
 
 function ContentFooter() {
   return (
     <div className="bg-white py-12 border-b border-gray-200 rounded-sm shadow-xs">
-      <div className="max-w-screen-xl mx-auto px-5 ml-8 flex justify-between flex-nowrap">
+      <div className="max-w-screen-xl mx-auto px-5 ml-8 flex justify-between ">
         <div className="flex justify-between w-full max-w-4xl">
         {contentData.map((item, index) => {
           return (
-            <div key={index} className="mb-5 text-[#e8ecef] min-w-0 flex-1">
+            <div key={index} className=" text-[#e8ecef] min-w-0 flex-1">
               <div>
                 <p className="text-sm pb-4 uppercase font-medium text-gray-700">
                   {item.heading}
