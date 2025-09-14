@@ -5,6 +5,7 @@ import mens from '../assets/mens.jpg'
 import womens from '../assets/women.jpg'
 import beauty from '../assets/sidebeauty.jpg'
 import toy from '../assets/toy.jpg'
+import sidehome from '../assets/sidehome.jpg'
 
 // Category data structure based on the image
 const categoryData = {
@@ -156,37 +157,44 @@ const categoryData = {
 
 function Sidebar() {
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [hoverTimeout, setHoverTimeout] = useState(null);
+  const [isMouseInSidebar, setIsMouseInSidebar] = useState(false);
+  const [isMouseInPopup, setIsMouseInPopup] = useState(false);
 
-  // Handle mouse enter with no delay
+  // Handle mouse enter category - immediate show
   const handleMouseEnter = (category) => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
     setHoveredCategory(category);
+    setIsMouseInSidebar(true);
   };
 
-  // Handle mouse leave with delay to prevent flickering
-  const handleMouseLeave = () => {
-    const timeout = setTimeout(() => {
-      setHoveredCategory(null);
-    }, 150); // 150ms delay before closing
-    setHoverTimeout(timeout);
+  // Handle sidebar mouse leave
+  const handleSidebarMouseLeave = () => {
+    setIsMouseInSidebar(false);
+    // Close popup after delay if mouse is not in popup
+    setTimeout(() => {
+      if (!isMouseInPopup && !isMouseInSidebar) {
+        setHoveredCategory(null);
+      }
+    }, 300);
   };
 
-  // Handle popup mouse enter (cancel closing)
+  // Handle popup mouse enter - keep popup open
   const handlePopupMouseEnter = () => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
+    setIsMouseInPopup(true);
+  };
+
+  // Handle popup mouse leave - close popup
+  const handlePopupMouseLeave = () => {
+    setIsMouseInPopup(false);
+    setHoveredCategory(null);
   };
 
   return (
     <div className="relative">
       {/* Main Sidebar */}
-      <div className="w-[230px] h-auto ml-[40px] bg-white border border-gray-200 shadow-sm">
+      <div 
+        className="w-[230px] h-auto ml-[40px] bg-white border border-gray-200 shadow-sm"
+        onMouseLeave={handleSidebarMouseLeave}
+      >
         
         {/* TOP CATEGORIES Section */}
         <div className="pt-3 pl-4 pb-1">
@@ -196,9 +204,11 @@ function Sidebar() {
         <div className="flex flex-col text-[12px] text-gray-600 px-4 pb-4 space-y-1">
           {/* Men's Fashion */}
           <div
-            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            className="flex items-center gap-3 py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0"
             onMouseEnter={() => handleMouseEnter("Men's Fashion")}
-            onMouseLeave={handleMouseLeave}
           >
             <img 
               src="https://g.sdlcdn.com/imgs/k/v/x/Men_sitenavigation-b972a.jpg" 
@@ -213,9 +223,11 @@ function Sidebar() {
 
           {/* Women's Fashion */}
           <div
-            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            className="flex items-center gap-3 py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0"
             onMouseEnter={() => handleMouseEnter("Women's Fashion")}
-            onMouseLeave={handleMouseLeave}
           >
             <img 
               src="https://g.sdlcdn.com/imgs/k/v/x/WoMen_sitenav-5a8ca.jpg" 
@@ -230,13 +242,15 @@ function Sidebar() {
 
           {/* Home & Kitchen */}
           <div 
-            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            className="flex items-center gap-3 py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0"
             onMouseEnter={() => handleMouseEnter("Home & Kitchen")}
-            onMouseLeave={handleMouseLeave}
           >
             <img 
               src="https://g.sdlcdn.com/imgs/k/v/x/HOme_sitenavigation-d7a00.jpg" 
-              className="w-6 h-6 rounded-full object-cover" 
+              className="w-6 h-6  rounded-full object-cover" 
               alt="Home & Kitchen"
               onError={(e) => {
                 e.target.src = "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=50&h=50&fit=crop";
@@ -247,9 +261,11 @@ function Sidebar() {
 
           {/* Toys, Kids' Fashion & More */}
           <div 
-            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+            className="flex items-center gap-3 py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0"
             onMouseEnter={() => handleMouseEnter("Toys, Kids' Fashion & More")}
-            onMouseLeave={handleMouseLeave}
           >
             <img 
               src="https://g.sdlcdn.com/imgs/k/v/x/Toys_Sitenavigation-ef666.jpg" 
@@ -263,10 +279,12 @@ function Sidebar() {
           </div>
 
           {/* Beauty, Health & Daily Care */}
-          <div 
-            className="flex items-center gap-3 py-2 cursor-pointer hover:text-[#e31e24] transition-colors"
+          <div
+           className="flex items-center gap-3 py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0"
             onMouseEnter={() => handleMouseEnter("Beauty, Health & Daily Care")}
-            onMouseLeave={handleMouseLeave}
           >
             <img 
               src="https://g.sdlcdn.com/imgs/k/v/x/Beauty_Site_navigation-5f3be.jpg" 
@@ -286,13 +304,34 @@ function Sidebar() {
         </div>
         
         <div className="flex flex-col text-[12px] text-gray-600 px-4 pb-4 space-y-1">
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Automotives</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Mobile & Accessories</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Electronics</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Sports, Fitness & Outdoor</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Computers & Gaming</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Books, Media & Music</span>
-          <span className="py-1 cursor-pointer hover:text-[#e31e24] transition-colors">Hobbies</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Automotives</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Mobile & Accessories</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Electronics</span>
+          <span className="py-1px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Sports, Fitness & Outdoor</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Computers & Gaming</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Books, Media & Music</span>
+          <span className="py-1 px-1 cursor-pointer
+             hover:border-l-2 hover:border-t hover:border-b
+             hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
+             hover:border-r-0">Hobbies</span>
         </div>
 
         {/* TRENDING SEARCHES Section */}
@@ -331,9 +370,9 @@ function Sidebar() {
       {/* Fixed Hover Dropdown Menu */}
       {hoveredCategory && categoryData[hoveredCategory] && (
         <div
-          className="absolute left-[230px] top-0 bg-white border border-gray-200 shadow-xl z-50 w-[700px] min-h-[400px] flex"
+          className="absolute left-[269px] top-0 bg-white border border-gray-200 shadow-xl z-50 w-[700px] min-h-[400px] flex"
           onMouseEnter={handlePopupMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseLeave={handlePopupMouseLeave}
         >
           {/* Categories Section */}
           <div className="flex-1 px-4 py-3">
@@ -350,19 +389,30 @@ function Sidebar() {
                       <Link
                         key={itemIndex}
                         to={`/category/${encodeURIComponent(item)}`}
-                        className="block text-[10px] text-gray-600 hover:text-[#e31e24] transition-colors py-0.5 leading-tight truncate no-underline"
+                        className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${
+                          item === "View All" 
+                            ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group" 
+                            : "text-gray-600 hover:text-black"
+                        }`}
                         title={item}
                       >
-                        {item}
+                        {item === "View All" ? (
+                          <>
+                            <span>View All</span>
+                            <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
+                          </>
+                        ) : (
+                          item
+                        )}
                       </Link>
                     ))}
                     {items.length > 8 && (
                       <Link
                         to={`/category/${encodeURIComponent(subcategory)}`}
-                        className="flex items-center text-[10px] text-[#e31e24] font-medium hover:text-red-700 transition-colors py-0.5 no-underline"
+                        className="flex items-center text-[10px] text-blue-400 font-medium transition-colors py-0.5 no-underline group"
                       >
                         <span>View All</span>
-                        <span className="ml-1 text-[8px]">›</span>
+                        <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
                       </Link>
                     )}
                   </div>
@@ -378,15 +428,9 @@ function Sidebar() {
                 <img 
                   src={mens} 
                   alt="Men's Fashion" 
-                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                  className="w-40 h-120 object-cover rounded-lg shadow-md mb-3"
                 />
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Men's Fashion</h3>
-                  <p className="text-xs text-gray-600 mb-2">40-80% OFF</p>
-                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
-                    Shop Now
-                  </button>
-                </div>
+                
               </div>
             )}
             
@@ -395,32 +439,20 @@ function Sidebar() {
                 <img 
                   src={womens} 
                   alt="Women's Fashion" 
-                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                  className="w-40 h-120 object-cover rounded-lg shadow-md mb-3"
                 />
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Women's Fashion</h3>
-                  <p className="text-xs text-gray-600 mb-2">50-90% OFF</p>
-                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
-                    Shop Now
-                  </button>
-                </div>
+                
               </div>
             )}
             
             {hoveredCategory === "Home & Kitchen" && (
               <div className="text-center">
                 <img 
-                  src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=300&fit=crop" 
+                  src={sidehome}
                   alt="Home & Kitchen" 
-                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                  className="w-40 h-120 object-cover rounded-lg shadow-md mb-3"
                 />
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Home & Kitchen</h3>
-                  <p className="text-xs text-gray-600 mb-2">Up to 70% OFF</p>
-                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
-                    Shop Now
-                  </button>
-                </div>
+                
               </div>
             )}
             
@@ -429,15 +461,9 @@ function Sidebar() {
                 <img 
                   src={toy}
                   alt="Kids Fashion" 
-                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                  className="w-40 h-120 object-cover rounded-lg shadow-md mb-3"
                 />
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Kids & Toys</h3>
-                  <p className="text-xs text-gray-600 mb-2">Min 40% OFF</p>
-                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
-                    Shop Now
-                  </button>
-                </div>
+               
               </div>
             )}
             
@@ -446,15 +472,9 @@ function Sidebar() {
                 <img 
                   src={beauty}
                   alt="Beauty Products" 
-                  className="w-28 h-36 object-cover rounded-lg shadow-md mb-3"
+                  className="w-40 h-120 object-cover rounded-lg shadow-md mb-3"
                 />
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Beauty & Health</h3>
-                  <p className="text-xs text-gray-600 mb-2">Up to 60% OFF</p>
-                  <button className="bg-[#e31e24] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">
-                    Shop Now
-                  </button>
-                </div>
+                
               </div>
             )}
           </div>
