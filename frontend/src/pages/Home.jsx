@@ -27,7 +27,7 @@ function Home() {
             <Carousel />
             <Delivery />
           </div>
-          <RecentlyViewedProducts  />
+          <RecentlyViewedProducts/>
         </div>
       </div>
       <TrendingProducts className="mt-[50px]" />

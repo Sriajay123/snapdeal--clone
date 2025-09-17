@@ -9,6 +9,7 @@ import userroute from './routes/userRoute.js'
 import productRoute from './routes/productRoute.js'
 import orderRoute from './routes/orderRoute.js'
 import paymentRoute from './routes/paymentRoute.js'
+import reviewRoute from './routes/reviewRoute.js'
 
 import dbConfig from './config/dbConfig.js'
 import Razorpay from 'razorpay'
@@ -35,6 +36,7 @@ app.use('/user',userroute)
 app.use('/product', productRoute)
 app.use('/orders', orderRoute)
 app.use('/payment', paymentRoute)
+app.use('/reviews', reviewRoute)
 
 
 

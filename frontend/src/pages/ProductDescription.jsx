@@ -163,7 +163,7 @@ function ProductDescription() {
           </div>
         </div>
         <div className="flex justify-center px-4 py-6">
-          <div className="w-[1250px] h-[625px] flex gap-8 border border-gray-200 bg-white">
+          <div className="w-[1350px] h-[625px] flex gap-8 border border-gray-200 bg-white">
             {/* Left: Image Gallery with Thumbnails */}
             <div className="flex w-1/2 h-full">
               {/* Thumbnail images */}
@@ -436,13 +436,16 @@ function ProductDescription() {
               </div>
             </div>
           </div>
+             
         </div>
+            <div className="w-[1350px]   mx-auto ml-23">
+
+             <ProductDetailsTabs product={product} />
+            </div>
       </div>
 
-      {/* Product Details Tabs */}
-      <div className="max-w-7xl mx-auto px-4 pb-12">
-        <ProductDetailsTabs product={product} />
-      </div>
+      
+  
       
       {/* OTP Verification Popup */}
       <OTPVerificationPopup

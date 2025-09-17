@@ -12,7 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home/>} />
-        <Route path="/product/:keyword/:id" element={<ProductDescription/>} />
+        <Route path="/product/:keyword/:id" element={<ProductDescription className='bg-[#f7f7f7]'/>} />
         <Route path="/admin/login" element={<AdminLogin/>} />
         <Route path="/admin/dashboard" element={<AdminDashboard/>} />
         <Route path="/my-orders" element={
