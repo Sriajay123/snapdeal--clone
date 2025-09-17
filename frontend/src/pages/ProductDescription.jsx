@@ -140,24 +140,34 @@ function ProductDescription() {
       <Navbar />
       <div className="bg-[#f7f7f7] min-h-screen">
         {/* Breadcrumbs */}
-        <div className=" border-b border-gray-200">
+        <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <nav className="flex items-center space-x-2 text-sm text-gray-600">
-              <Link to="/" className="hover:text-blue-600 transition-colors">
-               
+              <Link to="/" className="hover:text-red-600 transition-colors">
                 Home
               </Link>
               <span className="text-gray-400">›</span>
-              <Link to="#" className="hover:text-blue-600 transition-colors">
-                {product.category || 'Electronics'}
+              <Link 
+                to={product?.category === "Men's Fashion" ? "/product/mens-fashion" : "/"} 
+                className="hover:text-red-600 transition-colors"
+              >
+                {product?.category || 'Products'}
               </Link>
               <span className="text-gray-400">›</span>
-              <Link to="#" className="hover:text-blue-600 transition-colors">
-                {product.subcategory || product.category || 'Products'}
+              <Link 
+                to={
+                  product?.category === "Men's Fashion" && product?.subcategory === "T-Shirts" ? "/product/mens-fashion/tshirts" :
+                  product?.category === "Men's Fashion" && product?.subcategory === "Shirts" ? "/product/mens-fashion/shirts" :
+                  product?.category === "Men's Fashion" && product?.subcategory === "Jeans" ? "/product/mens-fashion/jeans" :
+                  "#"
+                } 
+                className="hover:text-red-600 transition-colors"
+              >
+                {product?.subcategory || product?.category || 'Products'}
               </Link>
               <span className="text-gray-400">›</span>
               <span className="text-gray-800 font-medium truncate">
-                {product.name}
+                {product?.name}
               </span>
             </nav>
           </div>

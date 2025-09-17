@@ -204,10 +204,11 @@ function Sidebar() {
         <div className="flex flex-col text-[12px] text-gray-600 px-4 pb-4 space-y-1">
           {/* Men's Fashion */}
           <div
+            to="/mens-fashion"
             className="flex items-center gap-3 py-1 px-1 cursor-pointer
              hover:border-l-2 hover:border-t hover:border-b
              hover:border-l-[#e31e24] hover:border-t-[#d1d5db] hover:border-b-[#d1d5db]
-             hover:border-r-0"
+             hover:border-r-0 no-underline text-gray-600"
             onMouseEnter={() => handleMouseEnter("Men's Fashion")}
           >
             <img 
@@ -218,7 +219,7 @@ function Sidebar() {
                 e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face";
               }}
             />
-            <span>Men's Fashion</span>
+           <span>Men's Fashion</span>
           </div>
 
           {/* Women's Fashion */}
@@ -385,30 +386,56 @@ function Sidebar() {
                     {subcategory}
                   </h4>
                   <div className="space-y-0.5">
-                    {items.slice(0, 8).map((item, itemIndex) => (
-                      <Link
-                        key={itemIndex}
-                        to={`/category/${encodeURIComponent(item)}`}
-                        className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${
-                          item === "View All" 
-                            ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group" 
-                            : "text-gray-600 hover:text-black"
-                        }`}
-                        title={item}
-                      >
-                        {item === "View All" ? (
-                          <>
-                            <span>View All</span>
-                            <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
-                          </>
-                        ) : (
-                          item
-                        )}
-                      </Link>
-                    ))}
+                    {items.slice(0, 8).map((item, itemIndex) => {
+                      // Define special routing for Men's Fashion clothing items
+                      let linkPath;
+                      if (hoveredCategory === "Men's Fashion" && subcategory === "CLOTHING") {
+                        switch(item) {
+                          case "Shirts":
+                            linkPath = "/product/mens-fashion/shirts";
+                            break;
+                          case "T-Shirts & Polos":
+                            linkPath = "/product/mens-fashion/tshirts";
+                            break;
+                          case "Jeans":
+                            linkPath = "/product/mens-fashion/jeans";
+                            break;
+                          default:
+                            linkPath = `/product/mens-fashion`;
+                        }
+                      } else if (item === "Sports Shoes") {
+                        linkPath = "/sports-shoes";
+                      } else {
+                        linkPath = `/product/${encodeURIComponent(item)}`;
+                      }
+
+                      return (
+                        <Link
+                          key={itemIndex}
+                          to={linkPath}
+                          className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${
+                            item === "View All" 
+                              ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group" 
+                              : "text-gray-600 hover:text-black"
+                          }`}
+                          title={item}
+                        >
+                          {item === "View All" ? (
+                            <>
+                              <span>View All</span>
+                              <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
+                            </>
+                          ) : (
+                            item
+                          )}
+                        </Link>
+                      );
+                    })}
                     {items.length > 8 && (
                       <Link
-                        to={`/category/${encodeURIComponent(subcategory)}`}
+                        to={hoveredCategory === "Men's Fashion" && subcategory === "CLOTHING" 
+                          ? "/product/mens-fashion" 
+                          : `/product/${encodeURIComponent(subcategory)}`}
                         className="flex items-center text-[10px] text-blue-400 font-medium transition-colors py-0.5 no-underline group"
                       >
                         <span>View All</span>
