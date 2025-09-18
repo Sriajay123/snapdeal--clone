@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/api";
 
 function AdminLogin() {
     const [formData, setFormData] = useState({
@@ -23,17 +24,31 @@ function AdminLogin() {
         setError("");
 
         try {
-            // For demo purposes, using hardcoded admin credentials
-            // In production, this should be handled by your backend API
-            if (formData.email === "admin@snapdeal.com" && formData.password === "admin123") {
-                localStorage.setItem("adminToken", "admin_authenticated");
-                localStorage.setItem("adminEmail", formData.email);
+            console.log('Attempting admin login with:', { email: formData.email });
+            const response = await api.post("/user/admin/login", {
+                email: formData.email,
+                password: formData.password
+            });
+
+            console.log('Login response:', response.data);
+
+            if (response.data.success) {
+                localStorage.setItem("adminToken", response.data.token);
+                localStorage.setItem("adminUser", JSON.stringify(response.data.user));
                 navigate("/admin/dashboard");
             } else {
-                setError("Invalid email or password");
+                setError(response.data.message || "Login failed");
             }
         } catch (err) {
-            setError("Login failed. Please try again.");
+            console.error('Admin login error:', err);
+            if (err.response) {
+                console.log('Error response:', err.response.data);
+                setError(err.response.data.message || "Login failed");
+            } else if (err.request) {
+                setError("Network error. Please check your connection.");
+            } else {
+                setError("Login failed. Please try again.");
+            }
         } finally {
             setLoading(false);
         }

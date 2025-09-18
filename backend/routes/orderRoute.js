@@ -4,8 +4,10 @@ import {
     getOrdersByPhone, 
     getOrderByNumber, 
     updateOrderStatus,
-    getAllOrders 
+    getAllOrders,
+    cancelOrder
 } from '../controllers/orderController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -18,10 +20,29 @@ router.get('/customer/:phone', getOrdersByPhone);
 // Get order by order number
 router.get('/order/:orderNumber', getOrderByNumber);
 
+// Cancel order
+router.put('/:suborderCode/cancel', cancelOrder);
+
 // Update order status (admin)
-router.put('/status/:orderNumber', updateOrderStatus);
+router.put('/:orderNumber/status', authenticateToken, (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: 'Access denied. Admin privileges required.'
+        });
+    }
+    next();
+}, updateOrderStatus);
 
 // Get all orders (admin)
-router.get('/admin/all', getAllOrders);
+router.get('/admin/all', authenticateToken, (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: 'Access denied. Admin privileges required.'
+        });
+    }
+    next();
+}, getAllOrders);
 
 export default router;

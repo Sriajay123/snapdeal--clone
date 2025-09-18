@@ -21,7 +21,7 @@ function RecentlyViewedProducts() {
     // Get recently viewed product IDs from localStorage
     const viewedIds = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
 
-    api.get("/product")
+    api.get("api/product")
       .then((res) => {
         const allProducts = res.data.products || [];
 

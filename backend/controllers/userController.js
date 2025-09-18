@@ -4,6 +4,66 @@ import bcrypt from 'bcrypt'
 import sendOtp from '../utils/sendOtp.js';
 import jwt from 'jsonwebtoken'
 
+export async function adminLogin(req, res) {
+    try {
+        const { email, password } = req.body;
+        console.log('Admin login attempt:', { email });
+
+        const user = await User.findOne({ email });
+        console.log('Found user:', user ? { 
+            email: user.email, 
+            isAdmin: user.isAdmin, 
+            role: user.role 
+        } : 'No user found');
+        
+        if (!user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "User not found with this email" 
+            });
+        }
+
+        if (!user.isAdmin && user.role !== 'ADMIN') {
+            return res.status(401).json({ 
+                success: false, 
+                message: "This user is not an admin" 
+            });
+        }
+
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        console.log('Password validation:', isValidPassword ? 'success' : 'failed');
+        
+        if (!isValidPassword) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid password" 
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role, isAdmin: user.isAdmin },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "7d" }
+        );
+
+        res.json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }
+        });
+    } catch (error) {
+        console.error('Admin login error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Server error during admin login"
+        });
+    }
+}
 
 export async function checkUser(req, res) {
   try {

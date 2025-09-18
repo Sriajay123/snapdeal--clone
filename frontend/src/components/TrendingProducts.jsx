@@ -17,7 +17,7 @@ function TrendingProducts() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        api.get("/product")
+        api.get("api/product")
             .then((res) => {
                 const sorted = res.data.products.sort((a, b) => b.rating - a.rating);
                 setProducts(sorted.slice(0, 10)); // ⬅️ take top 10

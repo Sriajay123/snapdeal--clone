@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import Navbar from "../components/Navbar";
@@ -29,13 +29,13 @@ function MyOrders() {
     const fetchOrders = async () => {
         try {
             console.log("Fetching orders for phone:", customerPhone);
-            const response = await api.get(`/orders/customer/${customerPhone}`);
+            const response = await api.get(`/api/orders/customer/${customerPhone}`);
             console.log("Orders response:", response.data);
-            
+
             if (response.data.success) {
                 setOrders(response.data.orders);
                 console.log("Orders set:", response.data.orders);
-                
+
                 // Detailed debugging for each order
                 response.data.orders.forEach((order, index) => {
                     console.log(`Order ${index}:`, order);
@@ -60,28 +60,28 @@ function MyOrders() {
 
     const formatLastUpdated = (dateString) => {
         const date = new Date(dateString);
-        const time = date.toLocaleTimeString('en-IN', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
+        const time = date.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
             second: '2-digit',
-            hour12: true 
+            hour12: true
         });
         const today = new Date();
         const orderDate = new Date(dateString);
-        
+
         const diffTime = Math.abs(today - orderDate);
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
+
         let dateText = "Today";
         if (diffDays === 1) {
             dateText = "Yesterday";
         } else if (diffDays > 1) {
-            dateText = orderDate.toLocaleDateString('en-IN', { 
-                day: '2-digit', 
-                month: 'short' 
+            dateText = orderDate.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short'
             });
         }
-        
+
         return `${time}, ${dateText}`;
     };
 
@@ -89,20 +89,20 @@ function MyOrders() {
         const order = new Date(orderDate);
         const deliveryStart = new Date(order);
         const deliveryEnd = new Date(order);
-        
+
         deliveryStart.setDate(order.getDate() + 1); // Next day
         deliveryEnd.setDate(order.getDate() + 2); // Day after next
-        
-        const startDate = deliveryStart.toLocaleDateString('en-IN', { 
-            day: '2-digit', 
-            month: 'short' 
+
+        const startDate = deliveryStart.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short'
         });
-        const endDate = deliveryEnd.toLocaleDateString('en-IN', { 
-            day: '2-digit', 
+        const endDate = deliveryEnd.toLocaleDateString('en-IN', {
+            day: '2-digit',
             month: 'short',
             year: 'numeric'
         });
-        
+
         return `${startDate} - ${endDate}`;
     };
 
@@ -117,22 +117,22 @@ function MyOrders() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Top Header */}
-             <Header/>
-             <Navbar/>
-             
+            <Header />
+            <Navbar />
+
 
             {/* Breadcrumb */}
             <div className="bg-white rounded-sm ml-33 w-[998px] px-4 py-2">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span 
+                        <span
                             className="hover:text-[#e40046] cursor-pointer"
                             onClick={() => navigate('/')}
                         >
                             Home
                         </span>
                         <span>›</span>
-                        <span 
+                        <span
                             className="hover:text-[#e40046] cursor-pointer"
                             onClick={() => navigate(0)}
                         >
@@ -159,7 +159,7 @@ function MyOrders() {
                                     </div>
                                     <div>
                                         <h3 className="font-medium text-gray-800">Sri Ajay S</h3>
-                                        <p className="text-sm text-gray-500">sriajaysnipni047@gmail.com</p>
+                                        <p className="text-sm text-gray-500">sriajaysanipini047@gmail.com</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 p-3 bg-blue-50 rounded text-sm text-gray-600">
@@ -221,7 +221,7 @@ function MyOrders() {
                                         <i className="fas fa-shopping-bag text-4xl text-gray-300 mb-4"></i>
                                         <p className="text-gray-600 text-lg mb-2">No orders found</p>
                                         <p className="text-gray-500 text-sm mb-4">Start shopping to see your orders here!</p>
-                                        <button 
+                                        <button
                                             onClick={() => navigate('/')}
                                             className="bg-[#e40046] text-white px-6 py-2 rounded hover:bg-[#c2003d] transition-colors"
                                         >
@@ -243,7 +243,7 @@ function MyOrders() {
                                                                 Placed on {formatDate(order.createdAt)}
                                                             </p>
                                                         </div>
-                                                        <button 
+                                                        <button
                                                             onClick={() => navigate(`/order-details/${order.orderNumber}`)}
                                                             className="bg-gray-700 text-white px-6 py-2 text-sm font-semibold rounded hover:bg-gray-800 transition-colors"
                                                         >
@@ -262,15 +262,15 @@ function MyOrders() {
                                                                     {/* Product Image */}
                                                                     <div className="w-24 h-24 rounded bg-white flex-shrink-0 overflow-hidden">
                                                                         <img
-                                                                            src={item?.productDetails?.image || item?.product?.image || "https://via.placeholder.com/96x96?text=No+Image"}
+                                                                            src={item?.productDetails?.image || item?.product?.image || "https://placehold.co/96x96/f0f0f0/999999/png?text=No+Image"}
                                                                             alt={item?.productDetails?.name || item?.product?.name || "Product"}
                                                                             className="w-full h-full object-cover"
                                                                             onError={(e) => {
-                                                                                e.target.src = "https://via.placeholder.com/96x96?text=No+Image";
+                                                                                e.target.src = "https://placehold.co/96x96/f0f0f0/999999/png?text=No+Image";
                                                                             }}
                                                                         />
                                                                     </div>
-                                                                    
+
                                                                     {/* Product Details */}
                                                                     <div className="flex-1">
                                                                         <div className="mb-2">
@@ -279,7 +279,7 @@ function MyOrders() {
                                                                                 {item?.productDetails?.name || item?.product?.name || "Product Name"}
                                                                             </h4>
                                                                         </div>
-                                                                        
+
                                                                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                                                                             {(item?.productDetails?.selectedSize || item?.selectedSize) && (
                                                                                 <span>Size: <span className="font-medium text-gray-800">{item?.productDetails?.selectedSize || item?.selectedSize}</span></span>
@@ -288,9 +288,13 @@ function MyOrders() {
                                                                                 <span>Color: <span className="font-medium text-gray-800">{item?.productDetails?.selectedColor || item?.selectedColor}</span></span>
                                                                             )}
                                                                         </div>
-                                                                        
+
                                                                         <div className="flex items-center gap-4">
-                                                                            <button className="text-gray-700 px-4 py-2 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
+                                                                            <button 
+                                                                                onClick={() => navigate(`/myorders/cancelOrder/${order.orderNumber}`)}
+                                                                                className="text-gray-700 px-4 py-2 text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+                                                                                disabled={['cancelled', 'delivered'].includes(order.orderStatus)}
+                                                                            >
                                                                                 CANCEL
                                                                             </button>
                                                                             <div className="flex items-center gap-2">
@@ -305,94 +309,83 @@ function MyOrders() {
                                                                 <div className="bg-white pt-6 border-t border-gray-100">
                                                                     <div className="flex justify-between items-start mb-4">
                                                                         <div>
-                                                                            <div className="text-sm text-gray-600 mb-1">
-                                                                                Status: <span className={`font-semibold uppercase ${
-                                                                                    order.orderStatus === 'delivered' ? 'text-green-600' :
-                                                                                    order.orderStatus === 'cancelled' ? 'text-red-600' :
-                                                                                    order.orderStatus === 'shipped' ? 'text-blue-600' :
-                                                                                    'text-green-600'
-                                                                                }`}>
-                                                                                    {order.orderStatus === 'cancelled' ? 'ORDER CANCELLED' : 
-                                                                                     order.orderStatus === 'delivered' ? 'ORDER DELIVERED' :
-                                                                                     order.orderStatus === 'shipped' ? 'ORDER SHIPPED' :
-                                                                                     'ORDER CONFIRMED'}
+                                                                            <div className="text-md text-[#817c80] mb-1">
+                                                                                Status: <span className={`font-semibold uppercase ${order.orderStatus === 'delivered' ? 'text-green-600' :
+                                                                                        order.orderStatus === 'cancelled' ? 'text-green-600' :
+                                                                                            order.orderStatus === 'shipped' ? 'text-green-600' :
+                                                                                                order.orderStatus === 'out_for_delivery' ? 'text-green-600' :
+                                                                                                    'text-green-600'
+                                                                                    }`}>
+                                                                                    {order.orderStatus === 'cancelled' ? 'ORDER CANCELLED' :
+                                                                                        order.orderStatus === 'delivered' ? 'ORDER DELIVERED' :
+                                                                                            order.orderStatus === 'shipped' ? 'ORDER SHIPPED' :
+                                                                                                order.orderStatus === 'packed' ? 'ORDER PACKED' :
+                                                                                                    order.orderStatus === 'out_for_delivery' ? 'OUT FOR DELIVERY' :
+                                                                                                        'ORDER CONFIRMED'}
                                                                                 </span>
                                                                             </div>
                                                                             <div className="text-xs text-gray-500">
-                                                                                Last updated at {formatLastUpdated(order.createdAt)}
+                                                                                {/* Last updated at {formatLastUpdated(order.createdAt)} */}
+                                                                                Last updated at {formatLastUpdated(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}
                                                                             </div>
                                                                         </div>
                                                                         <div className="text-right">
-                                                                            <div className="text-sm text-gray-600">
-                                                                                Est. Delivery: <span className="font-medium">{calculateEstimatedDelivery(order.createdAt)}</span>
-                                                                            </div>
+                                                                            {order.orderStatus === 'cancelled' ? (
+                                                                                <div className="text-md text-[#817c80]">
+                                                                                    Cancelled: <span className="font-medium text-green-600">{formatDate(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}</span>
+                                                                                </div>
+                                                                            ) : order.orderStatus === 'delivered' ? (
+                                                                                <div className="text-md text-[#817c80]">
+                                                                                    Delivered: <span className="font-medium text-green-600">{formatDate(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}</span>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="text-sm text-gray-600">
+                                                                                    Est. Delivery: <span className="font-medium">{calculateEstimatedDelivery(order.createdAt)}</span>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Progress Indicator */}
-                                                                    <div className="relative mb-6">
-                                                                        {/* Progress Line Background */}
-                                                                        <div className="absolute top-2 left-0 right-0 h-0.5 bg-gray-200"></div>
-                                                                        
-                                                                        {/* Progress Line Fill */}
-                                                                        <div 
-                                                                            className={`absolute top-2 left-0 h-0.5 ${
-                                                                                order.orderStatus === 'delivered' ? 'bg-green-500' :
-                                                                                order.orderStatus === 'cancelled' ? 'bg-red-500' :
-                                                                                order.orderStatus === 'shipped' ? 'bg-blue-500' :
-                                                                                'bg-green-500'
-                                                                            }`}
-                                                                            style={{ 
-                                                                                width: order.orderStatus === 'cancelled' || order.orderStatus === 'delivered' ? '100%' : 
-                                                                                       order.orderStatus === 'shipped' ? '50%' :
-                                                                                       '0%' 
-                                                                            }}
-                                                                        ></div>
-                                                                        
-                                                                        {/* Progress Points */}
-                                                                        <div className="flex justify-between items-center relative">
-                                                                            {/* Placed */}
-                                                                            <div className={`w-4 h-4 rounded-full border-2 ${
-                                                                                order.orderStatus !== 'cancelled' ? 'bg-green-500 border-green-500' : 'bg-red-500 border-red-500'
-                                                                            } flex items-center justify-center`}>
-                                                                            </div>
-                                                                            
-                                                                            {/* Packed */}
-                                                                            <div className={`w-4 h-4 rounded-full border-2 ${
-                                                                                ['packed', 'shipped', 'delivered'].includes(order.orderStatus) 
-                                                                                ? 'bg-gray-500 border-gray-500' : 'bg-gray-200 border-gray-300'
-                                                                            } flex items-center justify-center`}>
-                                                                            </div>
-                                                                            
-                                                                            {/* Shipped */}
-                                                                            <div className={`w-4 h-4 rounded-full border-2 ${
-                                                                                ['shipped', 'delivered'].includes(order.orderStatus) 
-                                                                                ? 'bg-blue-500 border-blue-500' : 'bg-gray-200 border-gray-300'
-                                                                            } flex items-center justify-center`}>
-                                                                            </div>
-                                                                            
-                                                                            {/* Out For Delivery */}
-                                                                            <div className={`w-4 h-4 rounded-full border-2 ${
-                                                                                ['out_for_delivery', 'delivered'].includes(order.orderStatus) 
-                                                                                ? 'bg-blue-500 border-blue-500' : 'bg-gray-200 border-gray-300'
-                                                                            } flex items-center justify-center`}>
-                                                                            </div>
-                                                                            
-                                                                            {/* Delivered */}
-                                                                            <div className={`w-4 h-4 rounded-full border-2 ${
-                                                                                order.orderStatus === 'delivered' ? 'bg-gray-600 border-gray-600' : 'bg-gray-200 border-gray-300'
-                                                                            } flex items-center justify-center`}>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        {/* Labels */}
-                                                                        <div className="flex justify-between mt-3 text-xs text-gray-500">
-                                                                            <span>Placed</span>
-                                                                            <span>Packed</span>
-                                                                            <span>Shipped</span>
-                                                                            <span>Out For Delivery</span>
-                                                                            <span>Delivered</span>
-                                                                        </div>
+                                                                    <div className="mb-6">
+                                                                        {order.orderStatus === 'cancelled' ? (
+                                                                            <>
+                                                                                <div className="flex justify-between items-center mb-3">
+                                                                                    {/* Confirmed */}
+                                                                                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                                                                                    {/* Line to Cancelled */}
+                                                                                    <div className="flex-1 h-0.5 bg-green-500 mx-2"></div>
+                                                                                    {/* Cancelled */}
+                                                                                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                                                                                </div>
+                                                                                <div className="flex justify-between text-xs">
+                                                                                    <span className="text-gray-500">Confirmed</span>
+                                                                                    <span className="text-gray-500"> Cancelled</span>
+                                                                                </div>
+                                                                                
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="flex justify-between items-center mb-3">
+                                                                                    {/* Regular order progress points */}
+                                                                                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                                                                                    <div className={`flex-1 h-0.5 ${['packed', 'shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'} mx-2`}></div>
+                                                                                    <div className={`w-4 h-4 rounded-full ${['packed', 'shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                                                                    <div className={`flex-1 h-0.5 ${['shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'} mx-2`}></div>
+                                                                                    <div className={`w-4 h-4 rounded-full ${['shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                                                                    <div className={`flex-1 h-0.5 ${['out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'} mx-2`}></div>
+                                                                                    <div className={`w-4 h-4 rounded-full ${['out_for_delivery', 'delivered'].includes(order.orderStatus) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                                                                    <div className={`flex-1 h-0.5 ${order.orderStatus === 'delivered' ? 'bg-green-500' : 'bg-gray-300'} mx-2`}></div>
+                                                                                    <div className={`w-4 h-4 rounded-full ${order.orderStatus === 'delivered' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                                                                </div>
+                                                                                <div className="flex justify-between text-xs text-gray-500">
+                                                                                    <span>Confirmed</span>
+                                                                                    <span>Packed</span>
+                                                                                    <span>Shipped</span>
+                                                                                    <span>Out For Delivery</span>
+                                                                                    <span>Delivered</span>
+                                                                                </div>
+                                                                            </>
+                                                                        )}
                                                                     </div>
 
                                                                     {/* Action Button */}

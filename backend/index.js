@@ -32,11 +32,11 @@ export const instance=new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 })
 
-app.use('/user',userroute)
-app.use('/product', productRoute)
-app.use('/orders', orderRoute)
-app.use('/payment', paymentRoute)
-app.use('/reviews', reviewRoute)
+app.use('/api/user',userroute)
+app.use('/api/product', productRoute)
+app.use('/api/orders', orderRoute)
+app.use('/api/payment', paymentRoute)
+app.use('/api/reviews', reviewRoute)
 
 
 

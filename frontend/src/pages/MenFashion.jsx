@@ -43,7 +43,7 @@ function MenFashion() {
   const fetchMensFashionProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/product/category/mens-fashion');
+      const response = await api.get('/api/product/category/mens-fashion');
       if (response.data.success) {
         setProducts(response.data.products);
         setFilteredProducts(response.data.products); // Initialize filtered products
@@ -735,7 +735,7 @@ function MenFashion() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;

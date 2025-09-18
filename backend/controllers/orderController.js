@@ -23,14 +23,23 @@ export const createOrder = async (req, res) => {
             });
         }
 
-        // Validate items and get product details
+        // Validate items, check stock and get product details
         const validatedItems = await Promise.all(
             items.map(async (item) => {
-                const productId = item.product || item.productId; // Support both formats
+                const productId = item.product || item.productId;
                 const product = await Product.findById(productId);
                 if (!product) {
                     throw new Error(`Product not found: ${productId}`);
                 }
+
+                // Check if enough stock is available
+                if (product.stock < item.quantity) {
+                    throw new Error(`Insufficient stock for product: ${product.name}`);
+                }
+
+                // Update product stock
+                product.stock -= item.quantity;
+                await product.save();
 
                 // Use frontend product details if provided, otherwise get from database
                 const productDetails = item.productDetails || {
@@ -149,13 +158,40 @@ export const updateOrderStatus = async (req, res) => {
         const { orderNumber } = req.params;
         const { status, message } = req.body;
         
-        const order = await Order.findOne({ orderNumber });
+        const order = await Order.findOne({ orderNumber })
+            .populate('items.product');
         
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: 'Order not found'
             });
+        }
+
+        const oldStatus = order.orderStatus;
+        
+        // Handle stock updates based on status change
+        if (status === 'cancelled' && oldStatus !== 'cancelled') {
+            // Return items to stock if order is cancelled
+            await Promise.all(order.items.map(async (item) => {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    product.stock += item.quantity;
+                    await product.save();
+                }
+            }));
+        } else if (oldStatus === 'cancelled' && status !== 'cancelled') {
+            // Deduct items from stock if order is un-cancelled
+            await Promise.all(order.items.map(async (item) => {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    if (product.stock < item.quantity) {
+                        throw new Error(`Insufficient stock for product: ${product.name}`);
+                    }
+                    product.stock -= item.quantity;
+                    await product.save();
+                }
+            }));
         }
 
         // Update status
@@ -190,19 +226,103 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 // Get all orders (for admin)
+// Cancel order (for customer)
+export const cancelOrder = async (req, res) => {
+    try {
+        const { suborderCode } = req.params;
+        const { reason, comments } = req.body;
+        
+        const order = await Order.findOne({ orderNumber: suborderCode })
+            .populate('items.product');
+        
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Check if order can be cancelled
+        if (['delivered', 'cancelled'].includes(order.orderStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order cannot be cancelled in its current state'
+            });
+        }
+
+        const oldStatus = order.orderStatus;
+        
+        // Return items to stock
+        await Promise.all(order.items.map(async (item) => {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.stock += item.quantity;
+                await product.save();
+            }
+        }));
+
+        // Update order status
+        order.orderStatus = 'cancelled';
+        
+        // Add to status history with reason
+        order.statusHistory.push({
+            status: 'cancelled',
+            message: `Order cancelled by customer. Reason: ${reason}${comments ? ` | Comments: ${comments}` : ''}`
+        });
+
+        // Store cancellation details
+        order.cancellation = {
+            reason,
+            comments,
+            date: new Date()
+        };
+
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Order cancelled successfully',
+            order: order
+        });
+
+    } catch (error) {
+        console.error('Error cancelling order:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to cancel order'
+        });
+    }
+};
+
 export const getAllOrders = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
 
-        const orders = await Order.find()
+        const statusFilter = req.query.status ? { orderStatus: req.query.status } : {};
+        const dateFilter = {};
+        
+        if (req.query.startDate && req.query.endDate) {
+            dateFilter.createdAt = {
+                $gte: new Date(req.query.startDate),
+                $lte: new Date(req.query.endDate)
+            };
+        }
+
+        const orders = await Order.find({
+            ...statusFilter,
+            ...dateFilter
+        })
             .populate('items.product')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        const totalOrders = await Order.countDocuments();
+        const totalOrders = await Order.countDocuments({
+            ...statusFilter,
+            ...dateFilter
+        });
 
         res.json({
             success: true,

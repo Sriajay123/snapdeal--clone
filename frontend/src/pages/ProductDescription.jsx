@@ -51,7 +51,7 @@ function ProductDescription() {
   // Fetch product by ID
   useEffect(() => {
     api
-      .get(`/product/${id}`)
+      .get(`api/product/${id}`)
       .then((res) => {
         const productData = res.data.product;
         setProduct(productData);

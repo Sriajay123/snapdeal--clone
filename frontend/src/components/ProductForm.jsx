@@ -159,10 +159,10 @@ function ProductForm({ product, onClose, onSave }) {
 
             if (product) {
                 // Update existing product
-                await api.put(`/product/${product._id}`, data);
+                await api.put(`/api/product/${product._id}`, data);
             } else {
                 // Create new product
-                await api.post("/product", data);
+                await api.post("/api/product", data);
             }
 
             onSave();

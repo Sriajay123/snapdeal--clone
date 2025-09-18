@@ -12,12 +12,15 @@ function OrderDetails() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const intervalId = setInterval(fetchOrderDetails, 5000); // Refresh every 5 seconds
         fetchOrderDetails();
+        
+        return () => clearInterval(intervalId); // Cleanup on unmount
     }, [orderNumber]);
 
     const fetchOrderDetails = async () => {
         try {
-            const response = await api.get(`/orders/order/${orderNumber}`);
+            const response = await api.get(`/api/orders/order/${orderNumber}`);
             if (response.data.success) {
                 setOrder(response.data.order);
             } else {
@@ -48,7 +51,22 @@ function OrderDetails() {
             second: '2-digit',
             hour12: true 
         });
-        return `${time}, Today`;
+        
+        const today = new Date();
+        const diffTime = Math.abs(today - date);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        let dateText = "Today";
+        if (diffDays === 1) {
+            dateText = "Yesterday";
+        } else if (diffDays > 1) {
+            dateText = date.toLocaleDateString('en-IN', { 
+                day: '2-digit', 
+                month: 'short' 
+            });
+        }
+        
+        return `${time}, ${dateText}`;
     };
 
     const calculateEstimatedDelivery = (orderDate) => {
@@ -184,9 +202,9 @@ function OrderDetails() {
                             <div>
                                 <h3 className="text-base font-semibold text-gray-800 mb-3">Customer Information</h3>
                                 <div className="text-sm text-gray-600 space-y-1">
-                                    <div>Name: <span className="text-gray-800">{order.customerInfo?.name || order.customerName || 'Name not available'}</span></div>
+                                 
                                     <div>Email: <span className="text-gray-800">{order.customerInfo?.email || order.customerEmail || 'Email not available'}</span></div>
-                                    <div>Phone: <span className="text-gray-800">{order.customerInfo?.phone || order.customerPhone || 'Phone not available'}</span></div>
+                              
                                 </div>
                             </div>
 
@@ -203,14 +221,9 @@ function OrderDetails() {
                                 </div>
                                 {order.paymentInfo?.status && (
                                     <div className="text-xs text-gray-600 mt-1">
-                                        Status: <span className={`font-medium ${
-                                            order.paymentInfo.status === 'completed' ? 'text-green-600' :
-                                            order.paymentInfo.status === 'pending' ? 'text-yellow-600' :
-                                            order.paymentInfo.status === 'failed' ? 'text-red-600' :
-                                            'text-gray-600'
-                                        }`}>
-                                            {order.paymentInfo.status.charAt(0).toUpperCase() + order.paymentInfo.status.slice(1)}
-                                        </span>
+                                      
+                                     {/* {order.paymentInfo.status.charAt(0).toUpperCase() + order.paymentInfo.status.slice(1)} */}
+                                       
                                     </div>
                                 )}
                             </div>
@@ -224,7 +237,7 @@ function OrderDetails() {
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-gray-600">Delivery Charges</span>
-                                        <span className={`text-sm font-semibold ${getDeliveryCharges() === 0 ? 'text-green-600' : 'text-gray-800'}`}>
+                                        <span className={`text-sm font-semibold ${getDeliveryCharges() === 0 ? 'text-gray-600' : 'text-gray-800'}`}>
                                             {getDeliveryCharges() === 0 ? 'FREE' : `Rs. ${getDeliveryCharges()}`}
                                         </span>
                                     </div>
@@ -252,11 +265,11 @@ function OrderDetails() {
                                         {/* Product Image */}
                                         <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                                             <img
-                                                src={item?.productDetails?.image || item?.product?.image || "https://via.placeholder.com/80x80?text=No+Image"}
+                                                src={item?.productDetails?.image || item?.product?.image || "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image"}
                                                 alt={item?.productDetails?.name || item?.product?.name || "Product"}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    e.target.src = "https://via.placeholder.com/80x80?text=No+Image";
+                                                    e.target.src = "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image";
                                                 }}
                                             />
                                         </div>
@@ -278,7 +291,11 @@ function OrderDetails() {
                                     <span>Color: <span className="font-medium text-gray-800">{item?.productDetails?.selectedColor || item?.selectedColor}</span></span>
                                 )}
                             </div>                                            <div className="flex items-center gap-4">
-                                                <button className="border border-gray-400 text-gray-700 px-4 py-1 text-sm rounded hover:bg-gray-50 transition-colors">
+                                                <button 
+                                                    onClick={() => navigate(`/myorders/cancelOrder/${order.orderNumber}`)}
+                                                    className="border border-gray-400 text-gray-700 px-4 py-1 text-sm rounded hover:bg-gray-50 transition-colors"
+                                                    disabled={['cancelled', 'delivered'].includes(order.orderStatus)}
+                                                >
                                                     CANCEL
                                                 </button>
                                                 <div className="flex items-center gap-2">
@@ -302,33 +319,96 @@ function OrderDetails() {
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
                                                 <div className="text-sm text-gray-600 mb-1">
-                                                    Status: <span className="font-semibold text-green-600">
-                                                        Processing Order
+                                                    Status: <span className={`font-semibold uppercase ${
+                                                        order.orderStatus === 'delivered' ? 'text-green-600' :
+                                                        order.orderStatus === 'cancelled' ? 'text-green-600' :
+                                                        order.orderStatus === 'shipped' ? 'text-green-600' :
+                                                        'text-green-600'
+                                                    }`}>
+                                                        {order.orderStatus === 'cancelled' ? 'ORDER CANCELLED' : 
+                                                         order.orderStatus === 'delivered' ? 'ORDER DELIVERED' :
+                                                         order.orderStatus === 'shipped' ? 'ORDER SHIPPED' :
+                                                         order.orderStatus === 'packed' ? 'ORDER PACKED' :
+                                                         order.orderStatus === 'out_for_delivery' ? 'OUT FOR DELIVERY' :
+                                                         'ORDER CONFIRMED'}
                                                     </span>
                                                 </div>
                                                 <div className="text-xs text-gray-500">
-                                                    Last updated at {formatLastUpdated(order.createdAt)}
+                                                    Last updated at {formatLastUpdated(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-sm text-gray-600">
-                                                    Est. Delivery: <span className="font-medium text-gray-800">{calculateEstimatedDelivery(order.createdAt)}</span>
-                                                </div>
+                                                {order.orderStatus === 'cancelled' ? (
+                                                    <div className="text-sm text-red-600">
+                                                        Cancelled: <span className="font-medium">{formatDate(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}</span>
+                                                    </div>
+                                                ) : order.orderStatus === 'delivered' ? (
+                                                    <div className="text-sm text-green-600">
+                                                        Delivered: <span className="font-medium">{formatDate(order.updatedAt || order.statusHistory?.[order.statusHistory.length - 1]?.date || order.createdAt)}</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-sm text-gray-600">
+                                                        Est. Delivery: <span className="font-medium text-gray-800">{calculateEstimatedDelivery(order.createdAt)}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
                                         {/* Progress Tracker */}
                                         <div className="mb-6">
                                             <div className="flex justify-between items-center mb-3">
-                                                <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                                                <div className="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-                                                <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                                                <div className="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-                                                <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                                                <div className="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-                                                <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                                                <div className="flex-1 h-0.5 bg-gray-300 mx-2"></div>
-                                                <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                                {/* Confirmed */}
+                                                <div className={`w-4 h-4 rounded-full ${
+                                                    order.orderStatus === 'cancelled' ? 'bg-red-500' : 'bg-green-500'
+                                                }`}></div>
+                                                
+                                                {/* Line to Packed */}
+                                                <div className={`flex-1 h-0.5 ${
+                                                    ['packed', 'shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) 
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                } mx-2`}></div>
+                                                
+                                                {/* Packed */}
+                                                <div className={`w-4 h-4 rounded-full ${
+                                                    ['packed', 'shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus)
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                }`}></div>
+                                                
+                                                {/* Line to Shipped */}
+                                                <div className={`flex-1 h-0.5 ${
+                                                    ['shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus)
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                } mx-2`}></div>
+                                                
+                                                {/* Shipped */}
+                                                <div className={`w-4 h-4 rounded-full ${
+                                                    ['shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus)
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                }`}></div>
+                                                
+                                                {/* Line to Out For Delivery */}
+                                                <div className={`flex-1 h-0.5 ${
+                                                    ['out_for_delivery', 'delivered'].includes(order.orderStatus)
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                } mx-2`}></div>
+                                                
+                                                {/* Out For Delivery */}
+                                                <div className={`w-4 h-4 rounded-full ${
+                                                    ['out_for_delivery', 'delivered'].includes(order.orderStatus)
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                }`}></div>
+                                                
+                                                {/* Line to Delivered */}
+                                                <div className={`flex-1 h-0.5 ${
+                                                    order.orderStatus === 'delivered'
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                } mx-2`}></div>
+                                                
+                                                {/* Delivered */}
+                                                <div className={`w-4 h-4 rounded-full ${
+                                                    order.orderStatus === 'delivered'
+                                                    ? 'bg-green-500' : 'bg-gray-300'
+                                                }`}></div>
                                             </div>
                                             
                                             <div className="flex justify-between text-xs text-gray-500">

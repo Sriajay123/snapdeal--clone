@@ -288,7 +288,7 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal, b
             console.log("Cart items before mapping:", cart.items);
 
             // Create order first
-            const response = await api.post('/orders', orderData);
+            const response = await api.post('api/orders', orderData);
             
             console.log("API Response:", response);
             

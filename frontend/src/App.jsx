@@ -10,6 +10,7 @@ import Shirts from "./pages/Shirts"
 import TShirts from "./pages/TShirts"
 import Jeans from "./pages/Jeans"
 import ProtectedRoute from "./components/ProtectedRoute"
+import CancelOrder from "./pages/CancelOrder"
 
 
 function App() {
@@ -35,6 +36,11 @@ function App() {
         <Route path="/order-details/:orderNumber" element={
           <ProtectedRoute>
             <OrderDetails/>
+          </ProtectedRoute>
+        } />
+        <Route path="/myorders/cancelOrder/:suborderCode" element={
+          <ProtectedRoute>
+            <CancelOrder/>
           </ProtectedRoute>
         } />
       </Routes>
