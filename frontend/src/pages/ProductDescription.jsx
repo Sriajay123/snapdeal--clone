@@ -30,6 +30,10 @@ function ProductDescription() {
   const [buyNowProduct, setBuyNowProduct] = useState(null);
 
   const handleBuyNow = () => {
+    if (product.stock === 0) {
+      return; // Don't proceed if out of stock
+    }
+    
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       alert("Please select a size");
       return;
@@ -89,13 +93,30 @@ function ProductDescription() {
 
   // Handle Check
   const handleCheckPincode = () => {
-    if (deliveryPin.trim() !== "") {
-      dispatch(setPincode(deliveryPin));
-      localStorage.setItem("pincode", deliveryPin);
-      setIsCheckingPin(false);
-    } else {
+    const pin = deliveryPin.trim();
+    
+    // Check if empty
+    if (pin === "") {
       alert("Please enter a pincode");
+      return;
     }
+
+    // Check if it's exactly 6 digits
+    if (!/^\d{6}$/.test(pin)) {
+      alert("Pincode must be exactly 6 digits");
+      return;
+    }
+
+    // Check if all digits are same
+    if (/^(\d)\1{5}$/.test(pin)) {
+      alert("Invalid pincode: All digits cannot be the same");
+      return;
+    }
+
+    // If all validations pass
+    dispatch(setPincode(pin));
+    localStorage.setItem("pincode", pin);
+    setIsCheckingPin(false);
   };
 
   // Handle Change
@@ -156,9 +177,9 @@ function ProductDescription() {
               <span className="text-gray-400">›</span>
               <Link 
                 to={
-                  product?.category === "Men's Fashion" && product?.subcategory === "T-Shirts" ? "/product/mens-fashion/tshirts" :
-                  product?.category === "Men's Fashion" && product?.subcategory === "Shirts" ? "/product/mens-fashion/shirts" :
-                  product?.category === "Men's Fashion" && product?.subcategory === "Jeans" ? "/product/mens-fashion/jeans" :
+                  product?.category === "Men's Fashion" && product?.subcategory === "T-Shirts" ? "/product/Men's Fashion/T-Shirts" :
+                  product?.category === "Men's Fashion" && product?.subcategory === "Shirts" ? "/product/Men's Fashion/Shirts" :
+                  product?.category === "Men's Fashion" && product?.subcategory === "Jeans" ? "/product/Men's Fashion/Jeans" :
                   "#"
                 } 
                 className="hover:text-red-600 transition-colors"
@@ -191,7 +212,7 @@ function ProductDescription() {
                       onClick={() => setSelectedImageIdx(idx)}
                     />
                     {selectedImageIdx === idx && (
-                      <div className="absolute inset-0 border-2 border-blue-500 rounded bg-blue-100 bg-opacity-20"></div>
+                      <div className="absolute inset-0 border-2 border-black rounded "></div>
                     )}
                   </div>
                 ))}
@@ -293,6 +314,11 @@ function ProductDescription() {
                     : Math.round(100 - (product.price / (product.price + 100)) * 100)}
                   % OFF
                 </span>
+                {product.stock === 0 && (
+                  <span className="bg-red-100 text-red-700 px-2 py-1 text-sm font-semibold rounded">
+                    Out of Stock
+                  </span>
+                )}
               </div>
 
               {/* Color Selection */}
@@ -362,37 +388,45 @@ function ProductDescription() {
               )}
 
               {/* Action buttons */}
-              <div className="flex gap-3 mb-6">
-                <button
-                  className="bg-gray-600 text-white px-8 py-3 font-semibold hover:bg-gray-700 disabled:opacity-50 transition-colors flex-1 max-w-[200px]"
-                  onClick={() => {
-                    // If product has sizes, require size selection. If no sizes, allow direct add to cart
-                    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-                      return; // Don't add if sizes exist but none selected
-                    }
-                    
-                    let productToAdd = { ...product };
-                    if (product.sizes && product.sizes.length > 0 && selectedSize) {
-                      productToAdd.selectedSize = selectedSize;
-                    }
-                    if (product.colors && product.colors.length > 0) {
-                      productToAdd.selectedColor = selectedColor || product.colors[0];
-                    }
-                    
-                    dispatch(addToCart(productToAdd));
-                  }}
-                  disabled={product.sizes && product.sizes.length > 0 && !selectedSize}
-                >
-                  ADD TO CART
-                </button>
-                <button 
-                  className="bg-[#e40046] text-white px-8 py-3 font-semibold hover:bg-[#c2003d] transition-colors flex items-center gap-2 flex-1 max-w-[200px] justify-center"
-                  onClick={handleBuyNow}
-                  disabled={product.sizes && product.sizes.length > 0 && !selectedSize}
-                >
-                  <i className="fas fa-bolt"></i>
-                  BUY NOW
-                </button>
+              <div className="flex flex-col gap-3 mb-6">
+                {product.stock === 0 && (
+                  <div className="bg-red-100 text-red-700 px-4 py-2 text-center font-medium rounded">
+                    Out of Stock
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    className="bg-gray-600 text-white px-8 py-3 font-semibold hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-1 max-w-[200px]"
+                    onClick={() => {
+                      // If product has sizes, require size selection. If no sizes, allow direct add to cart
+                      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                        alert("Please select a size");
+                        return;
+                      }
+                      
+                      let productToAdd = { ...product };
+                      if (product.sizes && product.sizes.length > 0 && selectedSize) {
+                        productToAdd.selectedSize = selectedSize;
+                      }
+                      if (product.colors && product.colors.length > 0) {
+                        productToAdd.selectedColor = selectedColor || product.colors[0];
+                      }
+                      
+                      dispatch(addToCart(productToAdd));
+                    }}
+                    disabled={(product.sizes && product.sizes.length > 0 && !selectedSize) || product.stock === 0}
+                  >
+                    {product.stock === 0 ? 'OUT OF STOCK' : 'ADD TO CART'}
+                  </button>
+                  <button 
+                    className="bg-[#e40046] text-white px-8 py-3 font-semibold hover:bg-[#c2003d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 flex-1 max-w-[200px] justify-center"
+                    onClick={handleBuyNow}
+                    disabled={(product.sizes && product.sizes.length > 0 && !selectedSize) || product.stock === 0}
+                  >
+                    <i className="fas fa-bolt"></i>
+                    {product.stock === 0 ? 'OUT OF STOCK' : 'BUY NOW'}
+                  </button>
+                </div>
               </div>
 
               {/* Delivery Section */}
@@ -405,7 +439,16 @@ function ProductDescription() {
                         type="text"
                         placeholder="Enter pincode"
                         value={deliveryPin}
-                        onChange={(e) => setDeliveryPin(e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow numbers and limit to 6 digits
+                          if ((/^\d*$/.test(value) || value === "") && value.length <= 6) {
+                            setDeliveryPin(value);
+                          }
+                        }}
+                        maxLength={6}
+                        inputMode="numeric"
+                        pattern="\d*"
                         className="border border-gray-300 px-3 py-2 flex-1 max-w-xs"
                       />
                       <button

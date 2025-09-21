@@ -4,6 +4,7 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   price: { type: Number, required: true },
+  oldPrice: { type: Number }, // Added oldPrice field
   category: { type: String, required: true },
   subcategory: { type: String },
   //  subType: { type: String },  // Added subType field

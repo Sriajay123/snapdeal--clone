@@ -320,18 +320,7 @@ function CategoryPage() {
               {baseCategory}
             </Link>
 
-            {/* Subcategory Link - only show if we have subcategory info */}
-            {(subcategoryInfo || urlSubcategory === 'Sports-Shoes') && (
-              <>
-                <span className="text-gray-400">/</span>
-                <Link 
-                  to={`/products/${encodeURIComponent(baseCategory)}/${encodeURIComponent(urlSubcategory)}`}
-                  className="hover:text-red-600 transition-colors"
-                >
-                  {urlSubcategory === 'Sports-Shoes' ? 'Sports Shoes' : subcategoryInfo?.name || urlSubcategory}
-                </Link>
-              </>
-            )}
+            
           </nav>
         </div>
       </div>
@@ -541,7 +530,7 @@ function CategoryPage() {
           {products.map((product) => (
             <Link
               key={product._id}
-              to={`/product/${product.name.toLowerCase().replace(/\s+/g, '-')}/${product._id}`}
+              to={`/product/${product.keyword.toLowerCase().replace(/\s+/g, '-')}/${product._id}`}
               className="bg-white border border-gray-200 hover:border-[#f6f6f6] hover:shadow-xl hover-bg-white transition-all duration-200"
             >
               <div className="relative">

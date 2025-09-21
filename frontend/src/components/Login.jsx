@@ -20,7 +20,7 @@ function Login({ onClose, setUser }) {
 const handleLoginSubmit = async (e) => {
   e.preventDefault();
   try {
-    const res = await api.post("/user/login", {
+    const res = await api.post("api/user/login", {
       email: emailOrMobile.includes("@") ? emailOrMobile : undefined,
       phone: !emailOrMobile.includes("@") ? emailOrMobile : undefined
     });
@@ -49,7 +49,7 @@ const handleLoginSubmit = async (e) => {
 const handleRegister = async (e) => {
   e.preventDefault();
   try {
-    const res = await api.post("/user/register", {
+    const res = await api.post("api/user/register", {
       name,
       email: registerEmail,
       phone: registerPhone,
@@ -72,7 +72,7 @@ const handleRegister = async (e) => {
 const handleVerifyOtp = async (e) => {
   e.preventDefault();
   try {
-    const res = await api.post("/user/verifyotp", {
+    const res = await api.post("api/user/verifyotp", {
       email: registerEmail || (emailOrMobile.includes("@") ? emailOrMobile : undefined),
       phone: registerPhone || (!emailOrMobile.includes("@") ? emailOrMobile : undefined),
       otpCode: otp

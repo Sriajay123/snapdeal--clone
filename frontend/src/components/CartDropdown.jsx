@@ -161,7 +161,7 @@ function CartDropdown({ isOpen, onClose }) {
                                                 <div className="product-image">
                                                     <img
                                                         className="w-16 h-16 object-contain border border-gray-200 rounded p-1"
-                                                        src={product.image}
+                                                        src={product.images[0]}
                                                         alt={product.name}
                                                     />
                                                 </div>

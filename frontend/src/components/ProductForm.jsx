@@ -6,6 +6,7 @@ function ProductForm({ product, onClose, onSave }) {
         name: "",
         brand: "",
         price: "",
+        oldPrice: "",
         images: [],
         category: "",
         subcategory: "",
@@ -30,6 +31,7 @@ function ProductForm({ product, onClose, onSave }) {
                 name: product.name || "",
                 brand: product.brand || "",
                 price: product.price || "",
+                oldPrice: product.oldPrice || "",
                 images: product.images || [],
                 category: product.category || "",
                 subcategory: product.subcategory || "",
@@ -154,6 +156,7 @@ function ProductForm({ product, onClose, onSave }) {
             const data = {
                 ...formData,
                 price: parseFloat(formData.price),
+                oldPrice: formData.oldPrice ? parseFloat(formData.oldPrice) : undefined,
                 rating: parseFloat(formData.rating)
             };
 
@@ -176,7 +179,7 @@ function ProductForm({ product, onClose, onSave }) {
     return (
         <>
             {/* Modal Backdrop */}
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}></div>
+            <div className="fixed inset-0  bg-opacity-50 z-50" onClick={onClose}></div>
 
             {/* Modal Dialog */}
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -250,8 +253,8 @@ function ProductForm({ product, onClose, onSave }) {
                             </div>
                         </div>
 
-                        {/* Price, Stock, and Rating */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Price, Old Price, Stock, and Rating */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Price *
@@ -262,6 +265,21 @@ function ProductForm({ product, onClose, onSave }) {
                                     value={formData.price}
                                     onChange={handleChange}
                                     required
+                                    min="0"
+                                    step="0.01"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e40046] focus:border-transparent"
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Old Price
+                                </label>
+                                <input
+                                    type="number"
+                                    name="oldPrice"
+                                    value={formData.oldPrice}
+                                    onChange={handleChange}
                                     min="0"
                                     step="0.01"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e40046] focus:border-transparent"
@@ -312,13 +330,13 @@ function ProductForm({ product, onClose, onSave }) {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e40046] focus:border-transparent mb-2"
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="shoes">Shoes</option>
-                                    <option value="clothing">Clothing</option>
+                                    <option value="Footwear">Footwear</option>
+                                    <option value="Men's Fashion">Men's Fashion</option>
                                     <option value="accessories">Accessories</option>
-                                    <option value="electronics">Electronics</option>
-                                    <option value="home">Home & Kitchen</option>
+                                    <option value="Ethnic Wear">Ethnic Wear</option>
+                                    <option value="KitchenAppliances">KitchenAppliances</option>
                                     <option value="sports">Sports</option>
-                                    <option value="books">Books</option>
+                                    <option value="WomenFootwear">WomenFootwear</option>
                                     <option value="custom">Custom Category</option>
                                 </select>
                                 {customCategory === "custom" && (

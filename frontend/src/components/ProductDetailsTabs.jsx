@@ -316,7 +316,7 @@ function ProductDetailsTabs({ product }) {
         <div className="space-y-4">
             <div className="text-sm text-gray-700 leading-relaxed space-y-4">
                 <p>
-                    Loard Shiv Trishul Damru Locket With Puchmukhi Rudraksha Mala Gold-plated Brass, Wood
+                   {product.description}
                 </p>
                 <p>
                     Keep Away From Water Perfume And Other Chemicals And Clean It With Dry And Soft Cloth
@@ -889,14 +889,14 @@ function ProductDetailsTabs({ product }) {
                         <div className="text-sm font-medium text-blue-600 mb-3">In Same Price</div>
                         <div>
                             <img 
-                                src={product?.image || "/api/placeholder/120/120"} 
+                                src={product?.images[0] || "/api/placeholder/120/120"} 
                                 alt="Related product" 
                                 className="w-full h-24 object-cover rounded mb-2"
                             />
                             <h4 className="text-xs text-gray-800 mb-1 leading-tight">
-                                Shiv Trishul Damru Gold-plated Locket with Rudraksha Mala
+                                {product.keyword}
                             </h4>
-                            <div className="text-xs text-gray-500 mb-2">Rs. 145 <span className="line-through text-gray-400">Rs.499</span></div>
+                            <div className="text-xs text-gray-500 mb-2">Rs. {product.price} <span className="line-through text-gray-400">Rs.{product.oldPrice}</span></div>
                             <button 
                                 onClick={() => handleBuyNow()}
                                 className="w-full bg-[#e40046] text-white text-xs py-2 rounded font-semibold hover:bg-[#c2003d] transition-colors"
