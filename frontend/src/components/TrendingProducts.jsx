@@ -52,7 +52,7 @@ function TrendingProducts() {
                                     style={{ height: "393px" }}
                                 >
                                     <img
-                                        src={product.image || "https://via.placeholder.com/150"}
+                                        src={product.images[0] || "https://via.placeholder.com/150"}
                                         alt={product.name}
                                         className="w-28 h-40 object-contain mb-2 rounded self-center"
                                     />

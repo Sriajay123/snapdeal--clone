@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   category: { type: String, required: true },
   subcategory: { type: String },
+  //  subType: { type: String },  // Added subType field
   brand: { type: String },
   images: [{ type: String }], // Array of image URLs
   stock: { type: Number, default: 0 },

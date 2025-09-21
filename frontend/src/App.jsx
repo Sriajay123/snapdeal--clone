@@ -5,12 +5,11 @@ import AdminLogin from "./pages/AdminLogin"
 import AdminDashboard from "./pages/AdminDashboard"
 import MyOrders from "./pages/MyOrders"
 import OrderDetails from "./pages/OrderDetails"
-import MenFashion from "./pages/MenFashion"
-import Shirts from "./pages/Shirts"
-import TShirts from "./pages/TShirts"
-import Jeans from "./pages/Jeans"
+import SearchResults from "./pages/SearchResults"
+
 import ProtectedRoute from "./components/ProtectedRoute"
 import CancelOrder from "./pages/CancelOrder"
+import CategoryPage from "./pages/CategoryPage"
 
 
 function App() {
@@ -19,12 +18,9 @@ function App() {
       <Routes>
         <Route index element={<Home/>} />
         <Route path="/product/:keyword/:id" element={<ProductDescription className='bg-[#f7f7f7]'/>} />
-        <Route path="product/mens-fashion" element={<MenFashion/>}>
-          <Route index element={<div className="p-4 text-center text-gray-600">Select a category from the sidebar</div>} />
-          <Route path="shirts" element={<Shirts/>} />
-          <Route path="tshirts" element={<TShirts/>} />
-          <Route path="jeans" element={<Jeans/>} />
-        </Route>
+        {/* Dynamic Category Routes */}
+        <Route path="/products/:category" element={<CategoryPage />} />
+        <Route path="/products/:category/:subcategory" element={<CategoryPage />} />
         <Route path="/admin/login" element={<AdminLogin/>} />
         <Route path="/admin/dashboard" element={<AdminDashboard/>} />
        
@@ -38,6 +34,7 @@ function App() {
             <OrderDetails/>
           </ProtectedRoute>
         } />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/myorders/cancelOrder/:suborderCode" element={
           <ProtectedRoute>
             <CancelOrder/>

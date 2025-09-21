@@ -77,7 +77,7 @@ function RecentlyViewedProducts() {
                     <div className=" p-5 flex flex-col transition-all duration-200 hover:border-[#f6f6f6] hover:shadow-xl hover-bg-white"
                       style={{ height: "393px" }}>
                       <img
-                        src={product.image || "https://via.placeholder.com/150"}
+                        src={product.images[0] || "https://via.placeholder.com/150"}
                         alt={product.name}
                         className="w-28 h-40 object-contain mb-2 rounded self-center"
                       />

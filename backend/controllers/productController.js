@@ -1,4 +1,5 @@
 import Product from '../models/productSchema.js';
+import mongoose from 'mongoose';
 
 // Create a product
 export async function createProduct(req, res) {
@@ -23,34 +24,100 @@ export async function getProducts(req, res) {
 // Get products by category
 export async function getProductsByCategory(req, res) {
   try {
-    const { category, subcategory } = req.params;
+    let { category, subcategory } = req.params;
+    let { 
+      minPrice, 
+      maxPrice, 
+      color, 
+      brand, 
+      size,
+      minRating,
+      minDiscount,
+      maxDiscount,
+      fabric,
+      sleevelength,
+      sort 
+    } = req.query;
     
     let filter = {};
-    
+
+    // Basic category filters
     if (category) {
-      // Map URL-friendly category names to database categories
-      let dbCategory = category;
-      if (category.toLowerCase() === 'mens-fashion') {
-        dbCategory = "Men's Fashion";
-      }
-      filter.category = dbCategory; // Exact match instead of regex
+      filter.category = category;
     }
-    
     if (subcategory) {
-      // Map URL-friendly subcategory names to database subcategories
-      let dbSubcategory = subcategory;
-      if (subcategory.toLowerCase() === 'shirts') {
-        dbSubcategory = "Shirts";
-      } else if (subcategory.toLowerCase() === 'tshirts') {
-        dbSubcategory = "T-Shirts";
-      } else if (subcategory.toLowerCase() === 'jeans') {
-        dbSubcategory = "Jeans";
-      }
-      filter.subcategory = dbSubcategory; // Exact match instead of regex
+      filter.subcategory = subcategory;
     }
-    
+
+    // Price filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Color filter
+    if (color) {
+      filter.color = { $in: color.split(',') };
+    }
+
+    // Brand filter
+    if (brand) {
+      filter.brand = { $in: brand.split(',') };
+    }
+
+    // Size filter
+    if (size) {
+      filter.size = { $in: size.split(',') };
+    }
+
+    // Rating filter
+    if (minRating) {
+      filter.rating = { $gte: Number(minRating) };
+    }
+
+    // Discount filter
+    if (minDiscount || maxDiscount) {
+      filter.discountPercentage = {};
+      if (minDiscount) filter.discountPercentage.$gte = Number(minDiscount);
+      if (maxDiscount) filter.discountPercentage.$lte = Number(maxDiscount);
+    }
+
+    // Fabric filter
+    if (fabric) {
+      filter.fabric = { $in: fabric.split(',') };
+    }
+
+    // Sleeve length filter
+    if (sleevelength) {
+      filter.sleevelength = { $in: sleevelength.split(',') };
+    }
+
     console.log('Filter being applied:', filter); // Debug log
-    const products = await Product.find(filter);
+
+    let query = Product.find(filter);
+
+    // Apply sorting
+    if (sort) {
+      switch(sort) {
+        case 'price_low':
+          query = query.sort({ price: 1 });
+          break;
+        case 'price_high':
+          query = query.sort({ price: -1 });
+          break;
+        case 'rating':
+          query = query.sort({ rating: -1 });
+          break;
+        case 'newest':
+          query = query.sort({ createdAt: -1 });
+          break;
+        default:
+          query = query.sort({ createdAt: -1 }); // Default to newest
+      }
+    }
+
+    const products = await query;
     console.log('Products found:', products.length); // Debug log
     res.json({ success: true, products, count: products.length });
   } catch (err) {
@@ -119,10 +186,30 @@ export async function getFilteredProducts(req, res) {
 // Get single product
 export async function getProduct(req, res) {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    let product;
+    const { id } = req.params;
+
+    // Try to find by ID first
+    try {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        product = await Product.findById(id);
+      }
+    } catch (error) {
+      console.log('Error finding by ID:', error);
+    }
+
+    // If not found by ID, try finding by keyword
+    if (!product) {
+      product = await Product.findOne({ keyword: id });
+    }
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
     res.json({ success: true, product });
   } catch (err) {
+    console.error('Error in getProduct:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 }
@@ -144,6 +231,38 @@ export async function deleteProduct(req, res) {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, message: 'Product deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// Search products
+export async function searchProducts(req, res) {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ success: false, message: 'Search query is required' });
+    }
+
+    // Create a search regex that is case insensitive
+    const searchRegex = new RegExp(q, 'i');
+
+    // Search in name, description, brand, category, and subcategory
+    const products = await Product.find({
+      $or: [
+        { name: searchRegex },
+        { description: searchRegex },
+        { brand: searchRegex },
+        { category: searchRegex },
+        { subcategory: searchRegex },
+      ]
+    });
+
+    res.json({ 
+      success: true, 
+      products,
+      count: products.length
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -25,7 +25,7 @@ function AdminLogin() {
 
         try {
             console.log('Attempting admin login with:', { email: formData.email });
-            const response = await api.post("/user/admin/login", {
+            const response = await api.post("api/user/admin/login", {
                 email: formData.email,
                 password: formData.password
             });

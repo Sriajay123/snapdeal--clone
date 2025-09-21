@@ -173,7 +173,7 @@ function ProductDescription() {
           </div>
         </div>
         <div className="flex justify-center px-4 py-6">
-          <div className="w-[1350px] h-[625px] flex gap-8 border border-gray-200 bg-white">
+          <div className="w-[1350px] h-auto flex gap-8 border border-gray-200 bg-white">
             {/* Left: Image Gallery with Thumbnails */}
             <div className="flex w-1/2 h-full">
               {/* Thumbnail images */}
@@ -198,7 +198,7 @@ function ProductDescription() {
               </div>
               
               {/* Main image with zoom */}
-              <div className="flex-1 relative bg-white border border-gray-200 h-full overflow-hidden">
+              <div className="flex-1 relative bg-white  h-full overflow-hidden">
                 <div 
                   className="relative w-full h-full cursor-crosshair"
                   onMouseMove={handleMouseMove}
@@ -208,7 +208,7 @@ function ProductDescription() {
                   <img
                     src={images[selectedImageIdx]}
                     alt={product.name}
-                    className={`w-full h-full object-contain transition-transform duration-200 ${
+                    className={`w-full h-auto mt-8 object-contain transition-transform duration-200 ${
                       isZoomed ? 'scale-150' : 'scale-100'
                     }`}
                     style={
@@ -221,7 +221,7 @@ function ProductDescription() {
                   />
                   
                   {/* Zoom indicator */}
-                  <div className={`absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded text-sm flex items-center transition-opacity duration-200 ${
+                  <div className={`absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-3 py-1  mb-10 rounded text-sm flex items-center transition-opacity duration-200 ${
                     isZoomed ? 'opacity-100' : 'opacity-60'
                   }`}>
                     <i className={`fas mr-2 ${isZoomed ? 'fa-search-minus' : 'fa-search-plus'}`}></i>
@@ -301,11 +301,11 @@ function ProductDescription() {
                 <div className="flex gap-2">
                   <div className="relative">
                     <img
-                      src={product.image}
+                      src={product.images[0]}
                       alt="color option"
                       className="w-12 h-16 object-cover border-2 border-blue-500 cursor-pointer"
                     />
-                    <span className="absolute -bottom-6 left-0 text-xs text-gray-600">Multicolor</span>
+                    {/* <span className="absolute -bottom-6 left-0 text-xs text-gray-600">Multicolor</span> */}
                   </div>
                 </div>
               </div>
@@ -434,14 +434,14 @@ function ProductDescription() {
                   )}
                 </div>
 
-                {/* Return Policy */}
-                <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <i className="fas fa-shield-alt text-green-600 mt-1"></i>
-                  <div>
-                    <span className="font-medium text-gray-800">7 Days Easy Returns</span>
-                    <span className="block">We assure easy return of purchased items within 7 days of delivery.</span>
-                    <button className="text-blue-500 hover:underline">Know More</button>
-                  </div>
+                {/* Return Policy */} 
+                <div className="flex items-center mb-10 gap-1">
+                  <i className="fas fa-shield-alt text-green-600 "></i>
+                 
+                    <span className="text-[13px] text-[#666666]">7 Days Easy Returns</span>
+                    <span className="text-xs text-[#999999] mt-0.5">We assure easy return of purchased items within 7 days of delivery.</span>
+                    <button className="text-[13px] text-blue-500">Know More &gt;</button>
+                  
                 </div>
               </div>
             </div>

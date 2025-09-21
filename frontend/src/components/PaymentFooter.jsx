@@ -21,9 +21,14 @@ function PaymentFooter() {
             <p>Connect</p>
              <div className='flex gap-2 mt-4 '>
                 {
-                socialIcons.map((icon,index)=>{
-                   return <img src={icon} alt="social"  style={{height:"35px", width:"35px"}}/>
-                })
+                socialIcons.map((icon, index) => (
+                   <img 
+                     key={index}
+                     src={icon} 
+                     alt={`social-icon-${index}`}  
+                     style={{height:"35px", width:"35px"}}
+                   />
+                ))
                 }
 
 

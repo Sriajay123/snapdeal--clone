@@ -1,15 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import cartlogo from "../assets/Cart.png";
 import signin from "../assets/signin.png";
 import Login from "./Login";
 import CartDropdown from "./CartDropdown";
 
+// Trending searches data
+const TRENDING_SEARCHES = [
+  'Kitchen Product',
+  'Shoes For Men',
+  'Kurti Set',
+  'Sandal Men',
+  'Sport Shoe Men',
+  'Saree',
+  'Tshirt',
+  'Wall Stickers'
+];
+
 function Navbar() {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const [user, setUser] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [recentSearches, setRecentSearches] = useState(() => {
+    const saved = localStorage.getItem('recentSearches');
+    return saved ? JSON.parse(saved) : [];
+  });
   const cartCount = useSelector((state) => state.cart.count);
 
   useEffect(() => {
@@ -19,6 +38,26 @@ function Navbar() {
       setUser(storedUser.name); // or storedUser.email
     }
   }, []);
+
+  const addToRecentSearches = (query) => {
+    if (!query) return;
+    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  };
+
+  const handleSearch = (query) => {
+    if (query.trim()) {
+      addToRecentSearches(query.trim());
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      setShowSearchDropdown(false);
+    }
+  };
+
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+  };
 
   return (
     <nav className="sticky top-0 z-50">
@@ -36,17 +75,98 @@ function Navbar() {
         </div>
 
         {/* Search bar */}
-        <div className="flex bg-white w-full mt-3 md:mt-0 md:w-[45%]">
+        <div className="flex bg-white w-full mt-3 md:mt-0 md:w-[45%] relative">
           <input
             type="text"
-            placeholder="Search product & brands"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSearchDropdown(true)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch(searchQuery);
+              }
+            }}
+            placeholder="Search products & brands"
             className="flex-grow px-4 py-2 outline-none text-sm"
           />
-          <button className="bg-[#333333] text-white px-4 text-sm font-medium hover:bg-black cursor-pointer">
+          <button 
+            onClick={() => handleSearch(searchQuery)}
+            className="bg-[#333333] text-white px-4 text-sm font-medium hover:bg-black cursor-pointer flex items-center gap-2"
+          >
             <i className="fa-solid fa-search text-md"></i>
             Search
           </button>
+
+          {/* Search Dropdown */}
+          {showSearchDropdown && (
+            <div className="absolute top-full left-0 right-[96px] bg-white border border-gray-200 shadow-lg z-50">
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && (
+                <div className="p-3 border-b border-gray-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <i className="far fa-clock text-sm"></i>
+                      <span className="text-xs uppercase">Recent Searches</span>
+                    </div>
+                    <button
+                      onClick={clearRecentSearches}
+                      className="text-xs text-gray-500 hover:text-red-600"
+                    >
+                      CLEAR
+                    </button>
+                  </div>
+                  <div className="space-y-1">
+                    {recentSearches.map((search, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between group cursor-pointer hover:bg-gray-100 px-2 py-1"
+                        onClick={() => handleSearch(search)}
+                      >
+                        <span className="text-md text-black">{search}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRecentSearches(recentSearches.filter((_, i) => i !== index));
+                          }}
+                          className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Trending Searches */}
+              <div className="p-3">
+                <div className="flex items-center gap-2 text-gray-500 mb-2">
+                  <i className="fas fa-chart-line text-sm"></i>
+                  <span className="text-xs uppercase">Trending Searches</span>
+                </div>
+                <div className="space-y-1">
+                  {TRENDING_SEARCHES.map((search, index) => (
+                    <div
+                      key={index}
+                      className="text-sm text-gray-700 hover:text-gray-500 hover:bg-gray-100 px-2 py-1 cursor-pointer px-2 py-1"
+                      onClick={() => handleSearch(search)}
+                    >
+                      {search}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Click outside handler */}
+        {showSearchDropdown && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowSearchDropdown(false)}
+          ></div>
+        )}
 
         {/* Cart */}
         <div 

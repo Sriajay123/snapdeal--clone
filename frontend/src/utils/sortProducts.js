@@ -1,5 +1,5 @@
 // src/utils/sortProducts.js
-export default function sortProducts(products, sortCriteria) {
+export function sortProducts(products, sortCriteria) {
   const sorted = [...products];
   switch (sortCriteria) {
     case 'Price: Low to High':
