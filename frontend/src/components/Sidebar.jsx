@@ -628,21 +628,21 @@ function Sidebar() {
         </div>
 
         <div className="flex flex-col text-[11px] text-gray-500 px-4 pb-4 space-y-1 ">
-          <span className="flex items-center py-1 cursor-pointer ">
+          <Link to="/products/Kitchenware" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
             <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kitchen Product
-          </span>
-          <span className="flex items-center py-1 cursor-pointer">
+          </Link>
+          <Link to="/products/Footwear" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
             <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Shoes For Men
-          </span>
-          <span className="flex items-center py-1 cursor-pointer ">
+          </Link>
+            <Link to="/products/Ethnic Wear/Kurtas & Kurtis" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
             <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kurti Set
-          </span>
-          <span className="flex items-center py-1 cursor-pointer">
+          </Link>
+          <Link to="/products/Footwear/Sandals & Floaters" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
             <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sandal Men
-          </span>
-          <span className="flex items-center py-1 cursor-pointer mb-8">
+          </Link>
+          <Link to="/products/Footwear/Sports Shoes" className="flex items-center py-1 cursor-pointer mb-8 no-underline text-gray-500 hover:text-gray-700">
             <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sport Shoe Men
-          </span>
+          </Link>
         </div>
 
 
@@ -693,10 +693,10 @@ function Sidebar() {
                               linkPath = '/products/Footwear/Casual Shoes'
                               break;
                             case "Slippers & Flip Flops":
-                              linkPath = '/products/Footwear/Slippers & Flip Flops'
+                              linkPath ='/products/Footwear/Slippers & Flip Flops'
                               break;
                             case "Sandals & Floaters":
-                              linkPath = '/products/Footwear/Sandals & Floaters'
+                              linkPath ='/products/Footwear/Sandals & Floaters'
                               break;
                             default:
                               linkPath = '/products/Footwear'
@@ -711,6 +711,10 @@ function Sidebar() {
                               case "Sarees":
                                 linkPath = "/products/Ethnic Wear/Sarees"
                                 break;
+                               case "Kurtas & Kurtis":
+                                linkPath = "/products/Ethnic Wear/Kurtas & Kurtis"
+                                break;
+                            
 
                               default:
                                 linkPath = "/products/Ethnic Wear"
@@ -745,9 +749,19 @@ function Sidebar() {
                                 linkPath = "/products/KitchenAppliances"
                             }
                           }
+                          else if (subcategory === "KITCHENWARE") {
+                            switch (item) {
+                              case "Pressure Cookers":
+                                linkPath = "/products/Kitchenware/Pressure Cookers"
+                                break;
+                                default:
+                                linkPath = "/products/Kitchenware"
+                           }
+                          }
                         }
-                        
-                        
+                       else if (hoveredCategory === "Toys, Kids' Fashion & More") {
+
+                       }
                         else {
                         linkPath = `/product/${encodeURIComponent(item)}`;
                         }

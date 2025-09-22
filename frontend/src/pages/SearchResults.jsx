@@ -77,34 +77,8 @@ function SearchResults() {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {products.map((product) => (
-                                <div
-                                    key={product._id}
-                                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                                    onClick={() => navigate(`/product/${product.category}/${product._id}`)}
-                                >
-                                    <div className="p-4">
-                                        <div className="aspect-square mb-4">
-                                            <img
-                                                src={product.images[0] || "https://placehold.co/300x300/f0f0f0/999999/png?text=No+Image"}
-                                                alt={product.name}
-                                                className="w-full h-full object-contain"
-                                            />
-                                        </div>
-                                        <h3 className="text-sm text-gray-800 font-medium mb-2 line-clamp-2">
-                                            {product.name}
-                                        </h3>
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-[#e40046] font-bold">
-                                                Rs. {product.price}
-                                            </div>
-                                            {product.mrp > product.price && (
-                                                <div className="text-xs text-gray-500 line-through">
-                                                    Rs. {product.mrp}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+
+                                window.location.href = `/products/${product.category}/${product.subcategory}`
                             ))}
                         </div>
                     </>

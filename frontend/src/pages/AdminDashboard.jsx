@@ -373,11 +373,18 @@ function AdminDashboard() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className={`text-sm font-medium ${
-                                                    order.paymentInfo.status === 'completed' ? 'text-green-600' : 'text-yellow-600'
+                                                    (order.paymentInfo.status === 'completed' || 
+                                                    (order.paymentInfo.method === 'cod' && order.orderStatus === 'delivered'))
+                                                    ? 'text-green-600' 
+                                                    : 'text-yellow-600'
                                                 }`}>
                                                     {order.paymentInfo.method.toUpperCase()}
                                                 </div>
-                                                <div className="text-sm text-gray-500">{order.paymentInfo.status}</div>
+                                                <div className="text-sm text-gray-500">
+                                                    {order.paymentInfo.method === 'cod' && order.orderStatus === 'delivered'
+                                                        ? 'Completed'
+                                                        : order.paymentInfo.status}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

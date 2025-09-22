@@ -150,8 +150,24 @@ const categoryFilters = {
       }
     }
   },
+ 
+  // "Kitchenware": {
+  //   default: {
+  //     priceRange: {     
 
-
+  //       min: 103,
+  //       max: 2289,
+  //       name: 'Price' 
+  //     },
+  //     swagostav:{
+  //       name:'Swagostav', 
+  //       options:['Diwali2025',' MissionSwagostav99']
+  //     }
+  //   },
+  //   subcategories: {
+  //     'Pressure Cookers': {
+  //       capacity: {
+  //         name: 'Capacity',
   "Footwear": {
     default: {
       priceRange: {

@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 import twilio from "twilio";
 
- function createTwilioClient() {
-  return twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
-}
+//  function createTwilioClient() {
+//   return twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+// }
 
  function createTransporter() {
   return nodemailer.createTransport({
@@ -17,7 +17,7 @@ import twilio from "twilio";
 
  async function sendOtp(user, otpCode) {
   const transporter = createTransporter();
-  const twilioClient = createTwilioClient();
+  // const twilioClient = createTwilioClient();
 
   try {
     if (user.email) {
@@ -30,14 +30,14 @@ import twilio from "twilio";
       console.log(`OTP sent to email: ${user.email}`);
     }
 
-    if (user.phone) {
-      await twilioClient.messages.create({
-        body: `Your OTP is ${otpCode}. It will expire in 5 minutes.`,
-        from: process.env.TWILIO_PHONE,
-        to: user.phone,
-      });
-      console.log(`OTP sent to phone: ${user.phone}`);
-    }
+    // if (user.phone) {
+    //   await twilioClient.messages.create({
+    //     body: `Your OTP is ${otpCode}. It will expire in 5 minutes.`,
+    //     from: process.env.TWILIO_PHONE,
+    //     to: user.phone,
+    //   });
+    //   console.log(`OTP sent to phone: ${user.phone}`);
+    // }
   } catch (err) {
     console.error("Failed to send OTP:", err);
     throw new Error("OTP sending failed");

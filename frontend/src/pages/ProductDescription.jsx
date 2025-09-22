@@ -169,23 +169,22 @@ function ProductDescription() {
               </Link>
               <span className="text-gray-400">›</span>
               <Link 
-                to={product?.category === "Men's Fashion" ? "/product/mens-fashion" : "/"} 
+                to={`/products/${encodeURIComponent(product?.category)}`}
                 className="hover:text-red-600 transition-colors"
               >
                 {product?.category || 'Products'}
               </Link>
               <span className="text-gray-400">›</span>
-              <Link 
-                to={
-                  product?.category === "Men's Fashion" && product?.subcategory === "T-Shirts" ? "/product/Men's Fashion/T-Shirts" :
-                  product?.category === "Men's Fashion" && product?.subcategory === "Shirts" ? "/product/Men's Fashion/Shirts" :
-                  product?.category === "Men's Fashion" && product?.subcategory === "Jeans" ? "/product/Men's Fashion/Jeans" :
-                  "#"
-                } 
-                className="hover:text-red-600 transition-colors"
-              >
-                {product?.subcategory || product?.category || 'Products'}
-              </Link>
+              {product?.subcategory && (
+                <>
+                  <Link 
+                    to={`/products/${encodeURIComponent(product?.category)}/${encodeURIComponent(product?.subcategory)}`}
+                    className="hover:text-red-600 transition-colors"
+                  >
+                    {product?.subcategory}
+                  </Link>
+                </>
+              )}
               <span className="text-gray-400">›</span>
               <span className="text-gray-800 font-medium truncate">
                 {product?.name}

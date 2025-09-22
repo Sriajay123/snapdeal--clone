@@ -94,13 +94,52 @@ export async function registerUser(req, res) {
   try {
     let { name, email, phone, dob, password } = req.body;
 
+    // Detailed validation
     if (!name || !email || !phone || !password) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "All fields are required",
+        details: {
+          name: !name ? "Name is required" : null,
+          email: !email ? "Email is required" : null,
+          phone: !phone ? "Phone is required" : null,
+          password: !password ? "Password is required" : null
+        }
+      });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format"
+      });
+    }
+
+    // Phone validation
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must be 10 digits"
+      });
+    }
+
+    // Password validation (at least 6 characters)
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long"
+      });
     }
 
     let existingUser = await User.findOne({ $or: [{ email }, { phone }] });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists" });
+      return res.status(400).json({ 
+        success: false, 
+        message: existingUser.email === email ? "Email already registered" : "Phone number already registered" 
+      });
     }
 
     const salt = await bcrypt.genSalt(10);

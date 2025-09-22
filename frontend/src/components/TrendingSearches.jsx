@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom"
 
 function TrendingSearches() {
   return (
@@ -12,36 +12,39 @@ function TrendingSearches() {
                 Trending searches:
               </span>
               <div className="flex gap-3 text-sm">
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                <Link to="/products/Kitchenware" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   kitchen product
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Footwear" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   shoes for men
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Ethnic Wear/Kurtas & Kurtis" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   kurti set
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Footwear/Sandals & Floaters" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   sandal men
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Footwear/Sports Shoes" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   sport shoe men
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Ethnic Wear/Sarees" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   saree
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link to="/products/Men's Fashion/T-Shirts" className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   tshirt
-                </span>
-                <span className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                </Link>
+                <Link  className="bg-white border border-gray-300  px-3 py-1 text-gray-700 hover:bg-gray-100 cursor-pointer">
                   wall stickers
-                </span>
+                </Link>
               </div>
             </div>
           </div>
         </div>
-        </>
 
+
+            
+        </>
+          
 
   )
 }

@@ -24,6 +24,10 @@ const categoryStructure = {
         name: 'Sports Shoes',
         subTypes: ['Running Shoes', 'Training Shoes', 'Walking Shoes', 'Cricket Shoes', 'Football Shoes']
     },
+    'Sandals & Floaters': {
+        name: 'Sandals & Floaters',
+        subTypes: ['Slippers For Men','Boots For Men','Ethnic Footwear For Men','Men Shoes Accessories','Men-Sandals & Floater']
+    },
     'Casual Shoes': {
       name: 'Casual Shoes',
       subTypes:['Casual Shoes For Men','Loafers For Men',' Formal Shoes For Men',
@@ -33,13 +37,9 @@ const categoryStructure = {
       name:'Slippers & Flip Flops',
       subTypes:['Slippers For Men','Boots For Men','Ethnic Footwear For Men','Men Shoes Accessories','Men-Sandals & Floater'],
     },
-    'Sandals & Floaters':{
-     name:'Sandals & Floaters',
-     subType:[
-      ''
-     ]
     
-    }
+    
+    
   }
   },
  
@@ -95,10 +95,10 @@ const categoryStructure = {
       //   name: 'Footwear',
       //   subTypes: ['Sports Shoes', 'Casual Shoes', 'Formal Shoes', 'Sandals']
       // },
-      'sports-shoes': {
-        name: 'Sports Shoes',
-        subTypes: ['Training Shoes', 'Basketball Shoes', 'Cricket Shoes', 'Running Shoes']
-      }
+      // 'sports-shoes': {
+      //   name: 'Sports Shoes',
+      //   subTypes: ['Training Shoes', 'Basketball Shoes', 'Cricket Shoes', 'Running Shoes']
+      // }
     }
   },
 
@@ -132,8 +132,13 @@ const categoryStructure = {
       'Sarees':{
         name: 'Sarees',
          subTypes: ['Silk Sarees', 'Cotton Sarees', 'Party Wear Sarees']
-      }
+      },
+      'Kurtas & Kurtis':{
+        name: 'Kurtas & Kurtis',
+        subTypes: []
+
      }
+    }
 
   },
   "Women Footwear":{
@@ -158,7 +163,17 @@ const categoryStructure = {
     }
   },
 
+   "Kitchenware":{
+    name:"Kitchenware",
+     subcategories:{  
+     'Pressure Cookers':{
+        name:'Pressure Cookers',
+        subTypes:['Cookware Sets','Pots & Pans','Tawa','Kadhai & Woks','Steamer & Idli Maker',
+          'Barbeque','Tandoor'] 
+     }
+   },
 
+  },
   "Kids & Toys": {
     name: "Kids & Toys",
     subcategories: {
@@ -319,6 +334,17 @@ function CategoryPage() {
             >
               {baseCategory}
             </Link>
+             <span className="text-gray-400">/</span>
+            {urlSubcategory && (
+               <Link to={`/products/${encodeURIComponent(baseCategory)}/${encodeURIComponent(urlSubcategory)}`} 
+               className="hover:text-red-600 transition-colors" >{urlSubcategory}</Link>
+
+
+            )}
+            
+
+
+           
 
             
           </nav>

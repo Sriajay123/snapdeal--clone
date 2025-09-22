@@ -337,6 +337,7 @@ function ProductForm({ product, onClose, onSave }) {
                                     <option value="KitchenAppliances">KitchenAppliances</option>
                                     <option value="sports">Sports</option>
                                     <option value="WomenFootwear">WomenFootwear</option>
+                                    <option value="Kitchenware">Kitchenware</option>
                                     <option value="custom">Custom Category</option>
                                 </select>
                                 {customCategory === "custom" && (

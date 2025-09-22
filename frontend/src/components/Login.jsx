@@ -48,6 +48,33 @@ const handleLoginSubmit = async (e) => {
 
 const handleRegister = async (e) => {
   e.preventDefault();
+
+  // Client-side validation
+  if (!name || !registerEmail || !registerPhone || !password) {
+    alert("All fields are required");
+    return;
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(registerEmail)) {
+    alert("Please enter a valid email address");
+    return;
+  }
+
+  // Phone validation
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phoneRegex.test(registerPhone)) {
+    alert("Phone number must be 10 digits");
+    return;
+  }
+
+  // Password validation
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters long");
+    return;
+  }
+
   try {
     const res = await api.post("api/user/register", {
       name,
@@ -60,12 +87,12 @@ const handleRegister = async (e) => {
     if (res.data.success) {
       // After registration, go to OTP step
       setStep("otp");
-    } else {
-      alert("Registration failed");
     }
   } catch (err) {
     console.error("Registration error:", err);
-    alert("Registration failed");
+    // Show the specific error message from the server
+    const errorMessage = err.response?.data?.message || "Registration failed";
+    alert(errorMessage);
   }
 };
 

@@ -22,7 +22,7 @@ function AdminNavbar() {
                     {/* Logo and Admin Label */}
                     <div className="flex items-center gap-4">
                         <h1 className="text-2xl font-bold">snapdeal</h1>
-                        <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="px-3 py-1 rounded-full text-sm font-medium">
                             Admin Panel
                         </span>
                     </div>
