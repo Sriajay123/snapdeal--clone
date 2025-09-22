@@ -1,9 +1,10 @@
 import { React, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import location from "../assets/location.jpg"             
+import location from "../assets/location.jpg";             
 import logincard from "../assets/logincard.png";
-import { removeFromCart } from "../store/cartSlice"; // Make sure this import path is correct
+import { removeFromCart } from "../store/cartSlice";
+import Login from "./Login";
 
 function Delivery() {
   const [pincode, setPincode] = useState(() => {
@@ -15,11 +16,12 @@ function Delivery() {
   });
   const [error, setError] = useState("");
   const [showLogin, setShowLogin] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const cartCount = useSelector((state) => state.cart.count);
   const [user, setUser] = useState(null);
   const cartItems = useSelector((state) => state.cart.items) || [];
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -35,19 +37,28 @@ function Delivery() {
   }, [user]);
 
   const handleSubmit = () => {
+    // Basic pincode validation: 6 digits, numeric, not all same digit
     if (!pincode) {
       setError("Please enter a pincode");
       setSubmitted(false);
       localStorage.removeItem('deliveryPincode');
-    } else if (pincode.length < 6) {
-      setError("Please enter a valid pincode");
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(pincode)) {
+      setError("Pincode must be exactly 6 digits");
       setSubmitted(false);
       localStorage.removeItem('deliveryPincode');
-    } else {
-      setError("");
-      setSubmitted(true);
-      localStorage.setItem('deliveryPincode', pincode);
+      return;
     }
+    if (/^([0-9])\1{5}$/.test(pincode)) {
+      setError("Pincode cannot be all the same digit");
+      setSubmitted(false);
+      localStorage.removeItem('deliveryPincode');
+      return;
+    }
+    setError("");
+    setSubmitted(true);
+    localStorage.setItem('deliveryPincode', pincode);
   };
 
   const handleChangePincode = () => {
@@ -69,24 +80,23 @@ function Delivery() {
       setShowLogin(true);
     } else if (cartItems.length > 0) {
       setShowCartSummary(true);
-       setSubmitted(true); // Add this line to ensure pincode is marked as submitted
-    }
-   
+      setSubmitted(true);
+    } 
   };
 
   const handleBackToPincode = () => {
     setShowLogin(false);
     setShowCartSummary(false);
-    setPincode("");
+    // setPincode("");
     setSubmitted(false);
-    localStorage.removeItem('deliveryPincode');
+    // localStorage.removeItem('deliveryPincode');
   };
 
   // Login Card Component
   const LoginCard = () => (
     <div>
       <div>
-        <img 
+        <img
           src={logincard}
           alt="Snapdeal"
           className="h-[129px] w-full mt-1 mr-1 ml-1"
@@ -94,21 +104,22 @@ function Delivery() {
       </div>
       <div className="flex flex-col p-4">
         <div className="flex flex-col items-center">
-          <p className="text-sm text-gray-600 mb-1">Login to your</p>        
+          <p className="text-sm text-gray-600 mb-1">Login to your</p>
           <p className="text-sm text-gray-600 mb-4">Snapdeal account</p>
-          
-          <Link 
-            to="/login"
+          <div>
+          <button
+            onClick={() => setShowLoginForm(true)}
             className="bg-[#333333] text-white mb-1 px-8 py-2 text-sm font-medium hover:bg-black cursor-pointer w-full text-center"
           >
             LOG IN
-          </Link>
+          </button>
+          </div>
           <div className="flex mt-4 justify-between items-center w-full">
             <div className="text-xs">
               <span className="text-gray-600">New user? </span>
               <Link to="/register" className="text-blue-500 hover:underline">Register</Link>
             </div>
-            <button 
+            <button
               onClick={handleLoginNext}
               className="text-xs px-4 py-1 text-[#666666] border border-gray-300 rounded hover:text-black"
             >
@@ -126,7 +137,7 @@ function Delivery() {
       e.preventDefault();
       e.stopPropagation();
       dispatch(removeFromCart(itemId));
-      
+
       if (cartItems.length === 1) {
         setTimeout(() => {
           handleBackToPincode();
@@ -154,10 +165,10 @@ function Delivery() {
                 className="flex items-center justify-between p-2 rounded hover:bg-gray-50 group relative"
               >
                 <div className="flex items-center">
-                  <img 
-                    src={Array.isArray(item.product.images) ? item.product.images[0] : item.product.image} 
-                    alt={item.product.name} 
-                    className="w-12 h-12 object-cover mr-2" 
+                  <img
+                    src={Array.isArray(item.product.images) ? item.product.images[0] : item.product.image}
+                    alt={item.product.name}
+                    className="w-12 h-12 object-cover mr-2"
                   />
                   <div>
                     <p className="font-medium text-xs">{truncateText(item.product.keyword, 3)}</p>
@@ -173,11 +184,11 @@ function Delivery() {
                 </button>
               </div>
             ))}
-            {cartItems.length > 2 && (
+            {/* {cartItems.length > 2 && (
               <p className="text-gray-600 text-sm text-center">
                 +{cartItems.length - 2} more items
               </p>
-            )}
+            )} */}
           </div>
         ) : (
           <div className="text-center text-gray-600 mb-4">
@@ -189,19 +200,19 @@ function Delivery() {
             <Link
               to="/checkout"
               className=" bg-[#333333] text-white py-1 px-8 mt-2 rounded text-center hover:bg-black transition-colors"
-        
+
             >
               VIEW ALL
             </Link>
           )}
-          <button 
+          <button
             onClick={handleBackToPincode}
-            className="px-6  text-[#666666] mt-2 border border-gray-300 rounded hover:text-black"
+            className=" px-6  text-[#666666] mt-2 border border-gray-300 rounded hover:text-black"
           >
             NEXT
           </button>
         </div>
-        
+
       </div>
     );
   };
@@ -218,8 +229,8 @@ function Delivery() {
     }
   };
 
-  // Render cart summary if showCartSummary is true
-  if (showCartSummary) {
+  // Render cart summary if showCartSummary is true and cart has items
+  if (showCartSummary && cartItems.length > 0) {
     return (
       <div className="flex flex-col h-auto w-[280px] ml-[4px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm">
         <CartSummaryCard />
@@ -236,8 +247,8 @@ function Delivery() {
     );
   }
 
-  // Render cart summary if user is logged in and next is clicked
-  if (user && submitted) {
+  // Render cart summary if user is logged in, next is clicked, and cart has items
+  if (user && submitted && cartItems.length > 0) {
     return (
       <div className="flex flex-col h-auto w-[280px] ml-[4px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm">
         <CartSummaryCard />
@@ -246,8 +257,9 @@ function Delivery() {
   }
 
   return (
-    <div className="flex flex-col h-auto w-[280px] ml-[4px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm p-3">
-      {/* Header */}
+    <>
+      <div className="flex flex-col h-auto w-[280px] ml-[4px] border border-[#f6f6f6] rounded-sm bg-white shadow-sm p-3">
+        {/* Header */}
       <div className="flex items-center justify-center">
         <img src={location} alt="location" />
       </div>
@@ -287,10 +299,9 @@ function Delivery() {
             >
               Change Pincode
             </button>
-            <button 
-              className={`px-4 py-1.5 text-[#666666] border border-gray-300 rounded hover:text-black ${
-                user && cartCount === 0 ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+            <button
+              className={`px-4 py-1.5 text-[#666666] border border-gray-300 rounded hover:text-black ${user && cartCount === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               onClick={handleNext}
               disabled={user && cartCount === 0}
             >
@@ -305,10 +316,9 @@ function Delivery() {
             >
               Submit
             </button>
-            <button 
-              className={`px-8 py-2 text-[#666666] border border-gray-300 rounded hover:text-black ${
-                user && cartCount === 0 ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+            <button
+              className={`px-8 py-2 text-[#666666] border border-gray-300 rounded hover:text-black ${user && cartCount === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               onClick={handleNext}
               disabled={user && cartCount === 0}
             >
@@ -316,8 +326,16 @@ function Delivery() {
             </button>
           </div>
         )}
-      </div>
+     
     </div>
+     </div>
+      {showLoginForm && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+        <Login onClose={() => setShowLoginForm(false)} setUser={setUser} />
+      </div>
+    )}
+
+    </>
   );
 }
 
