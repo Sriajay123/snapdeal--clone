@@ -60,13 +60,11 @@ function CartDropdown({ isOpen, onClose }) {
     return (
         <>  
       
-            {/* Modal Backdrop */}
-            <div
-                className="fixed inset-0 " onClick={onClose}
-            ></div>
-           
             {/* Modal Dialog */}
-            <div className="absolute top-[100px] ml-[200px] mt-2 bg-white rounded shadow-2xl w-[950px] z-50 border border-gray-200">
+            <div 
+                className="fixed top-[80px] left-1/2 -translate-x-1/2 bg-white rounded shadow-2xl w-[950px] border border-gray-200"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Cart Container */}
                 <div className="min-h-[400px]">
                     {/* Cart Heading */}

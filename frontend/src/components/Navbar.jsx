@@ -78,13 +78,17 @@ function Navbar() {
   // Handle clicks outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showCartDropdown && !event.target.closest('.cart-dropdown')) {
-        setShowCartDropdown(false);
+      // Don't close if clicking inside the cart dropdown or the cart button
+      if (event.target.closest('.cart-dropdown') || event.target.closest('.cart-button')) {
+        return;
       }
+      setShowCartDropdown(false);
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (showCartDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
   }, [showCartDropdown]);
 
   useEffect(() => {
@@ -111,8 +115,8 @@ function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50">
-      <div className="bg-[#e40046] flex flex-wrap items-center justify-between px-4 py-3 md:px-6">
+    <nav className="sticky top-0 z-40">
+      <div className="bg-[#e40046] flex items-center justify-between px-4 py-3 md:px-6">
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link to="/">
@@ -262,7 +266,7 @@ function Navbar() {
 
         {/* Cart */}
         <div 
-          className="flex items-center gap-2 text-[13px] cursor-pointer mt-3 md:mt-0 relative cart-dropdown"
+          className="flex items-center gap-2 text-[13px] cursor-pointer mt-3 md:mt-0 relative cart-button"
           onClick={(e) => {
             e.stopPropagation();
             setShowCartDropdown((prev) => !prev);
@@ -358,11 +362,21 @@ function Navbar() {
         )}
 
         {/* Cart Dropdown */}
-        <CartDropdown 
-          isOpen={showCartDropdown} 
-          onClose={() => setShowCartDropdown(false)} 
-          className="cart-dropdown"
-        />
+        {/* Cart Dropdown Portal */}
+        {showCartDropdown && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/30 z-50" 
+              onClick={() => setShowCartDropdown(false)} 
+            />
+            <div className="cart-dropdown fixed z-50">
+              <CartDropdown 
+                isOpen={showCartDropdown} 
+                onClose={() => setShowCartDropdown(false)} 
+              />
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );
