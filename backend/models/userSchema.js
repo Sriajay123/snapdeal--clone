@@ -33,6 +33,17 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["CUSTOMER", "ADMIN"], default: "CUSTOMER" },
   isAdmin: { type: Boolean, default: false },
 
+  addresses: [{
+    fullName: { type: String, required: true },
+    addressLine1: { type: String, required: true },
+    addressLine2: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
+    phone: { type: String, required: true },
+    type: { type: String, enum: ['home', 'office', 'other'], default: 'home' }
+  }],
+
   // isEmailVerified: { type: Boolean, default: false },
   // isPhoneVerified: { type: Boolean, default: false },
 

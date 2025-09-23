@@ -199,12 +199,38 @@ function OTPVerificationPopup({ isOpen, onClose, onPaymentSuccess, orderTotal, b
         setCurrentStep(2); // Move to address step
     };
 
-    const handleAddressContinue = () => {
+    const handleAddressContinue = async () => {
         if (!address.fullName || !address.addressLine1 || !address.city || !address.state || !address.pincode) {
             alert("Please fill all required address fields");
             return;
         }
-        console.log("Address saved:", address);
+
+        // Get the token from localStorage
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                // Save the address to the user's profile
+                const response = await api.post('/api/addresses', {
+                    ...address,
+                    type: 'home', // default type
+                    phone: address.phone || mobileNumber // use the OTP mobile number if no phone provided
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.data.success) {
+                    console.log("Address saved successfully:", response.data.address);
+                } else {
+                    console.warn("Address saved for order but not to profile:", address);
+                }
+            } catch (error) {
+                console.error("Error saving address to profile:", error);
+                // Continue with order even if saving to profile fails
+            }
+        }
+
         setCurrentStep(3); // Move to payment step
     };
 

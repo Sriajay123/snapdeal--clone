@@ -11,6 +11,8 @@ import orderRoute from './routes/orderRoute.js'
 import paymentRoute from './routes/paymentRoute.js'
 import reviewRoute from './routes/reviewRoute.js'
 import searchSuggestionRoute from './routes/searchSuggestionRoute.js'
+import addressRoute from './routes/addressRoute.js'
+import otpRoutes from './routes/otpRoutes.js'
 
 import dbConfig from './config/dbConfig.js'
 import Razorpay from 'razorpay'
@@ -39,6 +41,8 @@ app.use('/api/orders', orderRoute)
 app.use('/api/payment', paymentRoute)
 app.use('/api/reviews', reviewRoute)
 app.use('/api/search', searchSuggestionRoute)
+app.use('/api/addresses', addressRoute)
+app.use('/api/users', otpRoutes)
 
 
 

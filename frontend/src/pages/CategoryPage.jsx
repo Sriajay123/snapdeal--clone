@@ -224,6 +224,18 @@ function CategoryPage() {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [showAllOptions, setShowAllOptions] = useState({});
   const [deliveryPincode, setDeliveryPincode] = useState("584128");
+  const [selectedDiscount, setSelectedDiscount] = useState([]);
+
+  const handleDiscountChange = (value) => {
+    const newSelected = selectedDiscount.includes(value)
+      ? selectedDiscount.filter(v => v !== value)
+      : [...selectedDiscount, value];
+    setSelectedDiscount(newSelected);
+    setSelectedFilters(prev => ({
+      ...prev,
+      discount: newSelected
+    }));
+  };
 
   // Use category and subcategory directly from URL params since we're using consistent names
   const baseCategory = category;
@@ -253,26 +265,36 @@ function CategoryPage() {
       const queryParams = new URLSearchParams();
       
       // Add price range
-      queryParams.append('minPrice', appliedPriceRange.min);
-      queryParams.append('maxPrice', appliedPriceRange.max);
+      if (appliedPriceRange.min) queryParams.append('minPrice', appliedPriceRange.min);
+      if (appliedPriceRange.max) queryParams.append('maxPrice', appliedPriceRange.max);
       
       // Add selected filters
       Object.entries(selectedFilters).forEach(([key, values]) => {
         if (values && values.length > 0) {
-          if (key === 'rating') {
-            // Convert rating filter to number (e.g., "4★ & above" -> 4)
-            const rating = parseInt(values[0]);
-            if (!isNaN(rating)) {
-              queryParams.append('minRating', rating);
-            }
-          } else if (key === 'discount') {
-            // Convert discount range (e.g., "10-20" -> min: 10, max: 20)
-            const [min, max] = values[0].split('-').map(Number);
-            if (!isNaN(min)) queryParams.append('minDiscount', min);
-            if (!isNaN(max)) queryParams.append('maxDiscount', max);
-          } else {
-            // For color, brand, size, etc.
-            queryParams.append(key, values.join(','));
+          switch (key) {
+            case 'rating':
+              // Convert rating filter to number (e.g., "4★ & above" -> 4)
+              const rating = parseInt(values[0]);
+              if (!isNaN(rating)) {
+                queryParams.append('minRating', rating);
+              }
+              break;
+            case 'discount':
+              // Handle discount ranges
+              values.forEach(range => {
+                const [min, max] = range.split('-').map(Number);
+                if (!isNaN(min)) queryParams.append('minDiscount', min);
+                if (!isNaN(max)) queryParams.append('maxDiscount', max);
+              });
+              break;
+            case 'colors':
+            case 'brand':
+              // For colors and brand filters
+              queryParams.append(key.replace('colors', 'color'), values.join(','));
+              break;
+            default:
+              // For any other filters
+              queryParams.append(key, values.join(','));
           }
         }
       });
@@ -334,14 +356,17 @@ function CategoryPage() {
             >
               {baseCategory}
             </Link>
-             <span className="text-gray-400">/</span>
             {urlSubcategory && (
-               <Link to={`/products/${encodeURIComponent(baseCategory)}/${encodeURIComponent(urlSubcategory)}`} 
-               className="hover:text-red-600 transition-colors" >{urlSubcategory}</Link>
-
-
+              <>
+                <span className="text-gray-400">/</span>
+                <Link 
+                  to={`/products/${encodeURIComponent(baseCategory)}/${encodeURIComponent(urlSubcategory)}`} 
+                  className="hover:text-red-600 transition-colors"
+                >
+                  {urlSubcategory}
+                </Link>
+              </>
             )}
-            
 
 
            
@@ -377,6 +402,14 @@ function CategoryPage() {
       { value: 4, label: '4★ & above' },
       { value: 3, label: '3★ & above' },
       { value: 2, label: '2★ & above' },
+    ];
+
+    // Get discount options
+    const discountOptions = [
+      { value: '50-100', label: '50% and above' },
+      { value: '30-50', label: '30% - 50%' },
+      { value: '20-30', label: '20% - 30%' },
+      { value: '10-20', label: '10% - 20%' },
     ];
 
     // Get current filters based on category and subcategory
@@ -449,7 +482,7 @@ function CategoryPage() {
           // Determine filter type based on filterKey
           let filterType = 'checkbox';
           if (filterKey === 'rating') filterType = 'star';
-          if (filterKey === 'color') filterType = 'color';
+          if (filterKey === 'colors') filterType = 'color';
 
           // Get appropriate title based on filterKey
           const getTitleCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);

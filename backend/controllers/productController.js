@@ -58,7 +58,7 @@ export async function getProductsByCategory(req, res) {
 
     // Color filter
     if (color) {
-      filter.color = { $in: color.split(',') };
+      filter.colors = { $in: color.split(',') };
     }
 
     // Brand filter
@@ -78,9 +78,29 @@ export async function getProductsByCategory(req, res) {
 
     // Discount filter
     if (minDiscount || maxDiscount) {
-      filter.discountPercentage = {};
-      if (minDiscount) filter.discountPercentage.$gte = Number(minDiscount);
-      if (maxDiscount) filter.discountPercentage.$lte = Number(maxDiscount);
+      filter.$expr = {
+        $and: [
+          { $gt: ['$oldPrice', '$price'] }, // Only include products with a discount
+          {
+            $let: {
+              vars: {
+                discountPercentage: {
+                  $multiply: [
+                    { $divide: [{ $subtract: ['$oldPrice', '$price'] }, '$oldPrice'] },
+                    100
+                  ]
+                }
+              },
+              in: {
+                $and: [
+                  minDiscount ? { $gte: ['$$discountPercentage', Number(minDiscount)] } : true,
+                  maxDiscount ? { $lte: ['$$discountPercentage', Number(maxDiscount)] } : true
+                ]
+              }
+            }
+          }
+        ]
+      };
     }
 
     // Fabric filter
