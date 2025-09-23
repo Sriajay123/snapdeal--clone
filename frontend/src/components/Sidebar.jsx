@@ -376,7 +376,7 @@ const categoryData = {
 
 };
 
-function Sidebar() {
+function Sidebar({ isHoverState, onProductClick }) {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [isMouseInSidebar, setIsMouseInSidebar] = useState(false);
   const [isMouseInPopup, setIsMouseInPopup] = useState(false);
@@ -622,28 +622,36 @@ function Sidebar() {
 
 
 
-        {/* TRENDING SEARCHES Section */}
-        <div className="pt-2 pl-4 pb-1 ">
-          <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wider">TRENDING SEARCHES</span>
-        </div>
+        {/* TRENDING SEARCHES Section - Only show if not in hover state */}
+        {!isHoverState && (
+          <>
+            <div className="pt-2 pl-4 pb-1 ">
+              <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wider">TRENDING SEARCHES</span>
+            </div>
 
-        <div className="flex flex-col text-[11px] text-gray-500 px-4 pb-4 space-y-1 ">
-          <Link to="/products/Kitchenware" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
-            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kitchen Product
-          </Link>
-          <Link to="/products/Footwear" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
-            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Shoes For Men
-          </Link>
-            <Link to="/products/Ethnic Wear/Kurtas & Kurtis" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
-            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kurti Set
-          </Link>
-          <Link to="/products/Footwear/Sandals & Floaters" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
-            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sandal Men
-          </Link>
-          <Link to="/products/Footwear/Sports Shoes" className="flex items-center py-1 cursor-pointer mb-8 no-underline text-gray-500 hover:text-gray-700">
-            <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sport Shoe Men
-          </Link>
-        </div>
+            <div className="flex flex-col text-[11px] text-gray-500 px-4 pb-4 space-y-1 ">
+              <Link 
+                to="/products/Kitchenware" 
+                onClick={() => onProductClick && onProductClick()}
+                className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700"
+              >
+                <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kitchen Product
+              </Link>
+              <Link to="/products/Footwear" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
+                <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Shoes For Men
+              </Link>
+              <Link to="/products/Ethnic Wear/Kurtas & Kurtis" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
+                <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Kurti Set
+              </Link>
+              <Link to="/products/Footwear/Sandals & Floaters" className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700">
+                <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sandal Men
+              </Link>
+              <Link to="/products/Footwear/Sports Shoes" className="flex items-center py-1 cursor-pointer mb-8 no-underline text-gray-500 hover:text-gray-700">
+                <i className="fa-solid fa-search text-gray-400 text-[10px] mr-2"></i>Sport Shoe Men
+              </Link>
+            </div>
+          </>
+        )}
 
 
 
@@ -760,7 +768,7 @@ function Sidebar() {
                           }
                         }
                        else if (hoveredCategory === "Toys, Kids' Fashion & More") {
-
+                           
                        }
                         else {
                         linkPath = `/product/${encodeURIComponent(item)}`;
@@ -770,6 +778,7 @@ function Sidebar() {
                       <Link
                         key={itemIndex}
                         to={linkPath}
+                        onClick={() => onProductClick && onProductClick()}
                         className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${item === "View All"
                           ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group"
                           : "text-gray-600 hover:text-black"
@@ -790,8 +799,9 @@ function Sidebar() {
                       {items.length > 8 && (
                         <Link
                           to={hoveredCategory === "Men's Fashion" && subcategory === "CLOTHING"
-                            ? "/product/mens-fashion"
+                            ? "/product/Men's Fashion"
                             : `/product/${encodeURIComponent(subcategory)}`}
+                          onClick={() => onProductClick && onProductClick()}
                           className="flex items-center text-[10px] text-blue-400 font-medium transition-colors py-0.5 no-underline group"
                         >
                           <span>View All</span>

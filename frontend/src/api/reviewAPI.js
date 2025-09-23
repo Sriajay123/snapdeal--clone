@@ -6,7 +6,7 @@ export const reviewAPI = {
   createReview: async (reviewData) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.post('/reviews', reviewData, {
+      const response = await api.post('api/reviews', reviewData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -21,7 +21,7 @@ export const reviewAPI = {
   getProductReviews: async (productId, params = {}) => {
     try {
       const queryParams = new URLSearchParams(params).toString();
-      const response = await api.get(`/reviews/product/${productId}?${queryParams}`);
+      const response = await api.get(`api/reviews/product/${productId}?${queryParams}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch reviews' };
@@ -33,7 +33,7 @@ export const reviewAPI = {
     try {
       const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams(params).toString();
-      const response = await api.get(`/reviews/user?${queryParams}`, {
+      const response = await api.get(`api/reviews/user?${queryParams}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -48,7 +48,7 @@ export const reviewAPI = {
   canReviewProduct: async (productId, orderId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.get(`/reviews/can-review/${productId}/${orderId}`, {
+      const response = await api.get(`api/reviews/can-review/${productId}/${orderId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

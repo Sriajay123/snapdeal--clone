@@ -53,7 +53,7 @@ const CategoryAccordion = ({
     <div className="mb-6">
       {/* Accordion Header */}
       <div 
-        className="flex items-center text-sm font-medium text-gray-900 mb-3 pb-2 border-b cursor-pointer"
+        className="flex items-center text-sm font-medium text-gray-900 mb-3 pb-2 border-b border-gray-200 cursor-pointer"
         onClick={() => {
           setIsAccordionOpen(!isAccordionOpen);
           if (!isAccordionOpen) {

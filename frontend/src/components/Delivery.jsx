@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import location from "../assets/location.jpg";             
 import logincard from "../assets/logincard.png";
 import { removeFromCart } from "../store/cartSlice";
+import CartDropdown from "./CartDropdown";
 import Login from "./Login";
 
 function Delivery() {
@@ -19,6 +20,7 @@ function Delivery() {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const cartCount = useSelector((state) => state.cart.count);
   const [user, setUser] = useState(null);
+   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const cartItems = useSelector((state) => state.cart.items) || [];
   const dispatch = useDispatch();
 
@@ -197,13 +199,15 @@ function Delivery() {
         )}
         <div className="flex gap-2 ">
           {cartItems.length > 0 && (
-            <Link
-              to="/checkout"
+            <button
+              onClick={() => {
+                setShowCartDropdown(true);
+              }}
               className=" bg-[#333333] text-white py-1 px-8 mt-2 rounded text-center hover:bg-black transition-colors"
 
             >
               VIEW ALL
-            </Link>
+            </button>
           )}
           <button
             onClick={handleBackToPincode}
@@ -334,6 +338,21 @@ function Delivery() {
         <Login onClose={() => setShowLoginForm(false)} setUser={setUser} />
       </div>
     )}
+
+      {showCartDropdown && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/30 z-50" 
+              onClick={() => setShowCartDropdown(false)} 
+            />
+            <div className="cart-dropdown fixed z-50">
+              <CartDropdown 
+                isOpen={showCartDropdown} 
+                onClose={() => setShowCartDropdown(false)} 
+              />
+            </div>
+          </>
+        )}
 
     </>
   );

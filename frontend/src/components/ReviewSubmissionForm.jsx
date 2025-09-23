@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { reviewAPI } from '../api/reviewAPI';
 
 const ReviewSubmissionForm = ({ productId, orderId, onReviewSubmitted, onClose }) => {
   const [formData, setFormData] = useState({
@@ -41,34 +42,26 @@ const ReviewSubmissionForm = ({ productId, orderId, onReviewSubmitted, onClose }
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          productId,
-          orderId: orderId || null, // Allow null orderId
-          rating: formData.rating,
-          title: formData.title,
-          comment: formData.comment,
-          images: formData.images
-        })
-      });
+      const reviewData = {
+        productId,
+        orderId: orderId || null,
+        rating: formData.rating,
+        title: formData.title,
+        comment: formData.comment,
+        images: formData.images
+      };
 
-      const data = await response.json();
-
-      if (data.success) {
-        onReviewSubmitted(data.review);
+      const response = await reviewAPI.createReview(reviewData);
+      
+      if (response.success) {
+        onReviewSubmitted(response.review);
         onClose();
       } else {
-        setError(data.message || 'Failed to submit review');
+        setError(response.message || 'Failed to submit review');
       }
     } catch (error) {
       console.error('Submit review error:', error);
-      setError('Failed to submit review. Please try again.');
+      setError(error.message || 'Failed to submit review. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

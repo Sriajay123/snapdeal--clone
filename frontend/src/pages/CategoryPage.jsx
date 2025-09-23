@@ -9,6 +9,9 @@ import { sortProducts } from '../utils/sortProducts';
 import api from '../api/api';
 import categoryFilters from '../data/categoryFilters';
 import TrendingSearches from '../components/TrendingSearches';
+import PaymentFooter from "../components/PaymentFooter.jsx";
+import ContentFooter from "../components/ContentFooter.jsx";
+import CustomerTrustSection from "../components/CustomerTrustSection.jsx";
 
 // Utility function to return the original name since we're using the exact database names now
 const getDisplayName = (name) => name;
@@ -654,6 +657,7 @@ function CategoryPage() {
   };
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50">
       <Header />
       <Navbar />
@@ -676,6 +680,21 @@ function CategoryPage() {
         </div>
       </div>
     </div>
+
+
+     <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen mt-10">
+            <CustomerTrustSection/>
+            <ContentFooter/>
+            <PaymentFooter/>
+            <div className='bg-white w-full  h-11 flex  items-center justify-between  text-xs text-[#949aa2] '>
+          <span className=' mt-3 ml-10'>Copyright © 2021, Snapdeal Limited. All Rights Reserved</span>
+          <span className='mr-15' >Made for Bharat 
+           <i className="fa-solid fa-heart text-red-500 hover:scale-125 transition-transform duration-300 ml-2"></i>
+            </span>
+             </div> 
+        </div>
+
+    </>
   );
 }
 

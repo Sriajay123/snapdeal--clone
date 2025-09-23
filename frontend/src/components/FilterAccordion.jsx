@@ -174,7 +174,7 @@ const FilterAccordion = ({
   return (
     <div className="mb-6">
       <div 
-        className="flex items-center justify-between border-b pb-2 mb-4 cursor-pointer"
+        className="flex items-center justify-between border-b  border-gray-200 pb-2 mb-4 cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
         <h3 className="text-sm font-medium text-gray-700">{title}</h3>

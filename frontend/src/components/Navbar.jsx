@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import cartlogo from "../assets/Cart.png";
 import signin from "../assets/signin.png";
 import Login from "./Login";
 import CartDropdown from "./CartDropdown";
+import SidebarToggle from "./SidebarToggle";
 import { getSearchSuggestions } from "../api/searchAPI";
 
 // Trending searches data
@@ -21,6 +22,7 @@ const TRENDING_SEARCHES = [
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showLogin, setShowLogin] = useState(false);
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const [user, setUser] = useState("");
@@ -117,8 +119,8 @@ function Navbar() {
   return (
     <nav className="sticky top-0 z-40">
       <div className="bg-[#e40046] flex items-center justify-between px-4 py-3 md:px-6">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
+        {/* Logo and Menu Toggle */}
+        <div className="flex items-center space-x-4">
           <Link to="/">
             <img
               src="https://i3.sdlcdn.com/img/snapdeal/darwin/logo/sdLatestLogo.svg"
@@ -127,6 +129,7 @@ function Navbar() {
               className="h-8"
             />
           </Link>
+          {location.pathname !== '/' && <SidebarToggle />}
         </div>
 
         {/* Search bar */}

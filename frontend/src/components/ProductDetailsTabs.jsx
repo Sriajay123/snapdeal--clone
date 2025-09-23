@@ -5,6 +5,8 @@ import PaymentFooter from "./PaymentFooter.jsx";
 import ContentFooter from "./ContentFooter.jsx";
 import CustomerTrustSection from "./CustomerTrustSection.jsx";
 import OTPVerificationPopup from "./OTPVerificationPopup.jsx";
+import { Link } from "react-router-dom";
+import rupee from '../assets/rupee.png';
 
 
 function ProductDetailsTabs({ product }) {
@@ -47,6 +49,7 @@ function ProductDetailsTabs({ product }) {
         },
         nickname: ''
     });
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     
     // OTP popup state
     const [showOTPPopup, setShowOTPPopup] = useState(false);
@@ -174,6 +177,15 @@ function ProductDetailsTabs({ product }) {
             });
         }
     };
+    const scrollToQnA = () => {
+        const qnaSection = document.getElementById('questions-answers-section');
+        if (qnaSection) {
+            qnaSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    };
 
     const AccordionSection = ({ title, icon, isOpen, onToggle, children }) => (
         <div className="border-b-2 border-dotted border-gray-100 mb-4">
@@ -247,7 +259,7 @@ function ProductDetailsTabs({ product }) {
                 <div className="space-y-2">
                     <div className="flex items-start gap-2">
                         <span className="text-gray-400 mt-1">•</span>
-                        <span className="text-gray-600">Color-Blue</span>
+                        <span className="text-gray-600">Color-{product.colors[0]}</span>
                     </div>
                     <div className="flex items-start gap-2">
                         <span className="text-gray-400 mt-1">•</span>
@@ -289,7 +301,7 @@ function ProductDetailsTabs({ product }) {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <span className="text-gray-500">Common or Generic Name of the commodity</span>
-                        <span className="text-blue-600">Rudraksha & Jap Malas</span>
+                        <span className="text-gray-900">{product.subcategory}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <span className="text-gray-500">Manufacturer's Name & Address</span>
@@ -340,7 +352,7 @@ function ProductDetailsTabs({ product }) {
         const averageRating = reviewStats.averageRating || 0;
 
         return (
-            <div className="p-8 bg-gray-50">
+            <div className="p-8 bg-gray-50 cursor-pointer">
                 {/* Main Reviews Header */}
                 <div className="flex mb-8 bg-white border border-gray-200 p-6 relative">
                     {/* Left Side - Rating Summary */}
@@ -368,7 +380,7 @@ function ProductDetailsTabs({ product }) {
                         </div>
                         <button 
                             onClick={() => setActiveTab("reviews")}
-                            className="text-blue-600 text-sm hover:underline font-medium"
+                            className="text-blue-600 text-sm font-medium"
                         >
                             View All Reviews
                         </button>
@@ -426,9 +438,9 @@ function ProductDetailsTabs({ product }) {
                 </div>
 
                 {/* Customer Reviews Section */}
-                <div className=" rounded-lg  mt-6">
+                <div className="rounded-lg mt-6 bg-white">
                     {/* Reviews Header */}
-                    <div className="p-6 border-b border-gray-200">
+                    <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
                         <div className="flex justify-between items-center mb-4">
                             <div>
                                 <div className="text-sm text-gray-500 mb-1">
@@ -489,7 +501,7 @@ function ProductDetailsTabs({ product }) {
                     </div>
 
                     {/* Reviews List */}
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-200 max-h-[400px] overflow-y-auto">
                         {reviewsLoading ? (
                             <div className="p-6 text-center">
                                 <div className="text-gray-500">Loading reviews...</div>
@@ -569,6 +581,8 @@ function ProductDetailsTabs({ product }) {
     // Question Popup Modal
     const QuestionPopup = () => {
         if (!showQuestionPopup) return null;
+        
+        const textareaRef = React.useRef(null);
 
         const handleQuestionTypeChange = (type) => {
             setQuestionData(prev => ({
@@ -584,7 +598,7 @@ function ProductDetailsTabs({ product }) {
             e.preventDefault();
             // Here you can add the logic to submit the question
             console.log('Question submitted:', questionData);
-            // Reset form and close popup
+            // Reset form and show success popup
             setQuestionData({
                 question: '',
                 questionType: {
@@ -597,6 +611,7 @@ function ProductDetailsTabs({ product }) {
                 nickname: ''
             });
             setShowQuestionPopup(false);
+            setShowSuccessPopup(true);
         };
 
         const handleReset = () => {
@@ -634,8 +649,17 @@ function ProductDetailsTabs({ product }) {
                                 Your Question:
                             </label>
                             <textarea
+                                ref={textareaRef}
                                 value={questionData.question}
-                                onChange={(e) => setQuestionData(prev => ({ ...prev, question: e.target.value }))}
+                                onChange={(e) => {
+                                    setQuestionData({ ...questionData, question: e.target.value });
+                                    // Maintain focus after state update
+                                    if (textareaRef.current) {
+                                        const len = e.target.value.length;
+                                        textareaRef.current.focus();
+                                        textareaRef.current.setSelectionRange(len, len);
+                                    }
+                                }}
                                 placeholder="- Questions on products and its features"
                                 className="w-full border border-gray-300 rounded-md px-3 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
@@ -762,7 +786,7 @@ function ProductDetailsTabs({ product }) {
                         Ratings & Reviews
                     </button>
                     <button
-                        onClick={() => setActiveTab("questions")}
+                        onClick={scrollToQnA}
                         className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === "questions"
                                 ? "border-[#e40046] text-[#e40046]"
@@ -842,7 +866,7 @@ function ProductDetailsTabs({ product }) {
            {/* Right Sidebar*/}
                 <div className="w-100  p-0 bg-gray-50 ml-10 space-y-3">
                     {/* Sold By Component */}
-                    <div className="bg-white p-4  shadow-sm">
+                    <div className="bg-white p-4 shadow-sm">
                         <div className="text-xs text-gray-500 mb-1">Sold By</div>
                         <div className="text-sm font-medium text-gray-800 mb-2">SHIVJARE BROTHERS</div>
                         <div className="flex items-center gap-1 mb-2">
@@ -858,35 +882,38 @@ function ProductDetailsTabs({ product }) {
                             </span>
                             <span className="text-xs text-gray-600">({(reviewStats.averageRating || 0).toFixed(1)})</span>
                         </div>
-                        <button className="text-blue-600 text-xs hover:underline">View Store &gt;</button>
+                        <button className="text-blue-600 text-xs :underline">View Store &gt;</button>
                     </div>
 
                     {/* Sell on Snapdeal Component */}
                     <div className="bg-white p-4 shadow-sm">
-                        <button className="text-blue-600 text-sm hover:underline">Sell On Snapdeal</button>
+                        <button className="text-blue-600 text-sm ">Sell On Snapdeal</button>
                     </div>
 
                     {/* Explore More Component */}
-                    <div className="bg-white p-4 shadow-sm">
-                        <div className="text-sm font-medium text-gray-800 mb-2">Explore More</div>
-                        <button className="text-blue-600 text-sm hover:underline">&gt; Rudraksha &amp; Jap Malas</button>
-                        
-                        <div className="mt-4">
-                            <div className="text-xs text-gray-400 mb-2">Alternative</div>
-                            <button className="text-blue-600 text-xs hover:underline">More Rudraksha &amp; Jap Malas From jsk collection &gt;</button>
+                    <div className="bg-white  shadow-sm cursor-pointer ">
+                        <div className=" w-full text-sm font-medium text-gray-800 mb-2 shadow-sm p-4 ">Explore More &gt;
+                        <Link to="/products/Footwear/Sandals & Floaters"><button className="text-blue-600 text-sm">{product.subcategory}</button></Link>
+                        </div>
+                        <div className="mt-4 shadow-sm p-4 cursor-pointer">
+                            
+                            <button className="text-[#25A8ED] text-md ">More {product.subcategory} from {product.brand} </button>
                         </div>
 
                         {/* Rating Circle */}
-                        <div className="mt-4 flex justify-center">
-                            <div className="w-8 h-8 border-2 border-gray-300 rounded-full flex items-center justify-center">
-                                <span className="text-gray-400 text-sm">{Math.round(reviewStats.averageRating || 0)}</span>
-                            </div>
+                        <div className="mt-4 flex  flex-col justify-center align-center items-center  p-4">
+                           
+                               
+                            <img src={rupee} className="w-6 h-6"/>
+                                 
+                           
+                             <div className="text-md font-medium  mb-3 text-[#25A8ED]">In Same Price</div>
                         </div>
                     </div>
 
                     {/* In Same Price Component */}
-                    <div className="bg-white p-4  shadow-sm">
-                        <div className="text-sm font-medium text-blue-600 mb-3">In Same Price</div>
+                    <div className="bg-white p-6  shadow-sm sticky top-20">
+                      
                         <div>
                             <img 
                                 src={product?.images[0] || "/api/placeholder/120/120"} 
@@ -914,11 +941,51 @@ function ProductDetailsTabs({ product }) {
         
         </div>
 
-        <div className="w-[1150px] h-30 bg-white mt-10"> 
-            <span className="ml-10 mt-5"> Customer Product Selfies</span>
+
+          {/*Quick links */}
+        <div className="w-[1150px] bg-white mt-10 p-6"> 
+            <h2 className="text-lg font-medium mb-4 text-gray-800">Quick links</h2>
+            <div className="grid grid-cols-2 gap-y-3">
+                <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm min-w-[100px]">Product Type:</span>
+                    <div className="flex items-center gap-1">
+                        <Link to={`/products/${product.category}`} className="text-[#25A8ED] hover:underline text-sm">{product.category}</Link>
+                        <span className="text-gray-400 mx-1">›</span>
+                        <Link to={`/products/${product.category}/${product.subcategory}`} className="text-[#25A8ED] hover:underline text-sm">{product.subcategory}</Link>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm min-w-[45px]">Brand:</span>
+                    <div className="flex items-center">
+                        <Link to="/products/brand/ASIAN" className="text-[#25A8ED] hover:underline text-sm">{product.brand}</Link>
+                        <span className="text-gray-400 ml-1">›</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm min-w-[100px]">Type:</span>
+                    <div className="flex items-center">
+                        <Link to="/products/type/Sandals" className="text-[#25A8ED] hover:underline text-sm">{product.subcategory}</Link>
+                        <span className="text-gray-400 ml-1">›</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm min-w-[45px]">Size:</span>
+                    <div className="flex items-center">
+                        <Link to="/products/size/6" className="text-[#25A8ED] hover:underline text-sm">{product.sizes[0]}</Link>
+                        <span className="text-gray-400 ml-1">›</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm min-w-[100px]">Color:</span>
+                    <div className="flex items-center">
+                        <Link to="/products/color/Black" className="text-[#25A8ED] hover:underline text-sm">{product.colors[0]}</Link>
+                        <span className="text-gray-400 ml-1">›</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div className="w-[1150px] h-[650px] bg-white mt-10 p-6" id="ratings-reviews-section">
+        <div className="w-[1150px] min-h-[650px] max-h-[800px] bg-white mt-10 p-6 overflow-hidden" id="ratings-reviews-section">
             {renderRatingsReviews()}
         </div>
 
@@ -932,7 +999,7 @@ function ProductDetailsTabs({ product }) {
             />
         )}
 
-        <div className="w-[1150px] mt-4 bg-white border border-gray-200">
+        <div className="w-[1150px] mt-4 bg-white border border-gray-200" id="questions-answers-section">
             <div className="p-6">
                 <h2 className="text-lg font-medium text-gray-800 mb-4">Questions & Answers</h2>
                 <div className="flex justify-between items-center bg-[#fafafa] p-6 rounded-lg">
@@ -965,7 +1032,7 @@ function ProductDetailsTabs({ product }) {
                 <div className="flex items-center bg-[#fafafa] p-6 rounded-lg">
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
                         <div className="">
-                            <i class="fas fa-store" style={{width:"60",h:"40"}}  ></i>
+                            <i className="fas fa-store" style={{width:"60",h:"40"}}  ></i>
                         </div>
                     </div>
                     <div className="flex-1">
@@ -978,7 +1045,7 @@ function ProductDetailsTabs({ product }) {
                         </div>
                         <div className="flex items-center text-sm">
                             <span className="text-gray-600 mr-4">Expand your business to millions of customers</span>
-                            <button className="text-blue-600 hover:underline">Sell this item on Snapdeal</button>
+                            <button className="text-blue-600">Sell this item on Snapdeal</button>
                         </div>
                     </div>
                 </div>
@@ -1010,6 +1077,42 @@ function ProductDetailsTabs({ product }) {
             orderTotal={buyNowProduct?.price || 0}
             buyNowProduct={buyNowProduct}
         />
+            {/* Success Popup */}
+            {showSuccessPopup && (
+                <div className="fixed inset-0 flex items-center justify-center  z-50">
+                    <div className="fixed inset-0 bg-black opacity-50"></div>
+                    <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative z-50">
+                        <div className="absolute right-4 top-4">
+                            <button 
+                                onClick={() => setShowSuccessPopup(false)}
+                                className="text-gray-400 hover:text-gray-600 text-2xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        <div className="text-center">
+                            <div className="mb-6">
+                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Thank you!</h2>
+                                <p className="text-lg text-gray-600 mb-2">Your question is valuable.</p>
+                                <p className="text-sm text-gray-500">We'll email you as soon as we have an answer for you.</p>
+                            </div>
+                            
+                            <button
+                                onClick={() => setShowSuccessPopup(false)}
+                                className="bg-[#e40046] text-white px-8 py-2 rounded font-medium hover:bg-[#c2003d] transition-colors"
+                            >
+                                GOT IT!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

@@ -28,6 +28,7 @@ function ProductDescription() {
   const [isCheckingPin, setIsCheckingPin] = useState(true);
   const [showOTPPopup, setShowOTPPopup] = useState(false);
   const [buyNowProduct, setBuyNowProduct] = useState(null);
+  const [pincodeError, setPincodeError] = useState("");
 
   const handleBuyNow = () => {
     if (product.stock === 0) {
@@ -94,22 +95,23 @@ function ProductDescription() {
   // Handle Check
   const handleCheckPincode = () => {
     const pin = deliveryPin.trim();
+    setPincodeError("");
     
     // Check if empty
     if (pin === "") {
-      alert("Please enter a pincode");
+      setPincodeError("Please enter a valid pincode");
       return;
     }
 
     // Check if it's exactly 6 digits
     if (!/^\d{6}$/.test(pin)) {
-      alert("Pincode must be exactly 6 digits");
+      setPincodeError("Please enter a valid pincode");
       return;
     }
 
     // Check if all digits are same
     if (/^(\d)\1{5}$/.test(pin)) {
-      alert("Invalid pincode: All digits cannot be the same");
+      setPincodeError("Please enter a valid pincode");
       return;
     }
 
@@ -289,10 +291,29 @@ function ProductDescription() {
                   ))}
                   <span className="text-gray-600 text-sm ml-2">({product.rating})</span>
                 </div>
-                <span className="text-blue-600 text-sm hover:underline cursor-pointer">{product.numReviews || 7505} Ratings</span>
-                <span className="text-blue-600 text-sm hover:underline cursor-pointer">{Math.floor((product.numReviews || 7505) * 0.034)} Reviews</span>
-                <span className="text-blue-600 text-sm hover:underline cursor-pointer">{Math.floor((product.numReviews || 7505) * 0.003)} Selfies</span>
-                <span className="text-blue-600 text-sm cursor-pointer hover:underline">Have a question?</span>
+                <span className="text-blue-600 text-sm  cursor-pointer">{product.numReviews || 7505} Ratings</span>
+                <span 
+                onClick={() => {
+
+                  const reviewsSection = document.getElementById('ratings-reviews-section');
+                  if (reviewsSection) {
+                    reviewsSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                
+                className="text-blue-600 text-sm  cursor-pointer">{product.numReviews} Reviews</span>
+                <span className="text-blue-600 text-sm  cursor-pointer">{Math.floor((product.numReviews || 7505) * 0.003)} Selfies</span>
+                <span 
+                  onClick={() => {
+                    const questionsSection = document.getElementById('questions-answers-section');
+                    if (questionsSection) {
+                      questionsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="text-blue-600 text-sm cursor-pointer "
+                >
+                  Have a question?
+                </span>
               </div>
 
               {/* Price */}
@@ -340,7 +361,7 @@ function ProductDescription() {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-gray-700 text-base">Size</span>
-                    <span className="text-blue-500 text-sm cursor-pointer hover:underline">Size Chart</span>
+                    <span className="text-blue-500 text-sm cursor-pointer ">Size Chart</span>
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     {product.sizes.map((size) => (
@@ -429,27 +450,33 @@ function ProductDescription() {
               </div>
 
               {/* Delivery Section */}
-              <div className="border-t pt-6">
+              <div className=" pt-6">
                 <div className="mb-4">
                   <span className="text-gray-700 text-base block mb-3">Delivery</span>
                   {isCheckingPin ? (
                     <div className="flex items-center gap-2 mb-4">
-                      <input
-                        type="text"
-                        placeholder="Enter pincode"
-                        value={deliveryPin}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          // Only allow numbers and limit to 6 digits
-                          if ((/^\d*$/.test(value) || value === "") && value.length <= 6) {
-                            setDeliveryPin(value);
-                          }
-                        }}
-                        maxLength={6}
-                        inputMode="numeric"
-                        pattern="\d*"
-                        className="border border-gray-300 px-3 py-2 flex-1 max-w-xs"
-                      />
+                      <div className="flex flex-col flex-1 max-w-xs">
+                        <input
+                          type="text"
+                          placeholder="Enter pincode"
+                          value={deliveryPin}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setPincodeError("");
+                            // Only allow numbers and limit to 6 digits
+                            if ((/^\d*$/.test(value) || value === "") && value.length <= 6) {
+                              setDeliveryPin(value);
+                            }
+                          }}
+                          maxLength={6}
+                          inputMode="numeric"
+                          pattern="\d*"
+                          className="border border-gray-300 px-3 py-2 w-full focus:outline-none focus:border-black"
+                        />
+                        {pincodeError && (
+                          <span className="text-[#e40046] text-xs mt-1">{pincodeError}</span>
+                        )}
+                      </div>
                       <button
                         className="bg-black text-white px-6 py-2 font-medium hover:bg-gray-800"
                         onClick={handleCheckPincode}
@@ -466,7 +493,7 @@ function ProductDescription() {
                         <span className="text-sm text-gray-600">Delivery to pincode:</span>
                         <span className="font-medium text-gray-800">{pincode}</span>
                         <button
-                          className="text-blue-500 text-sm hover:underline"
+                          className="text-blue-500 text-sm "
                           onClick={handleChangePincode}
                         >
                           Change
