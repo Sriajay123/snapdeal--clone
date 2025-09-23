@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
 import PaymentFooter from "../components/PaymentFooter.jsx";
@@ -7,6 +8,7 @@ import ContentFooter from "../components/ContentFooter.jsx";
 import CustomerTrustSection from "../components/CustomerTrustSection.jsx";
 import axios from 'axios';
 import Secure from '../assets/Secure.png';
+import { showSuccessNotification, hideSuccessNotification } from '../store/notificationSlice';
 function ChangePassword() {
   const [user, setUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
@@ -14,6 +16,8 @@ function ChangePassword() {
   const [showOtpPopup, setShowOtpPopup] = useState(false);
   const [otp, setOtp] = useState('');
   const [otpError, setOtpError] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Get user data from localStorage
@@ -42,30 +46,32 @@ function ChangePassword() {
       return;
     }
 
-    // Show OTP popup directly for now (temporary fix)
-    setShowOtpPopup(true);
-    setError('');
-
-    // try {
-    //   console.log('Sending OTP request to:', user.email);
+    try {
+      console.log('Sending OTP request to:', user.email);
       
-    //   // Send OTP to user's email
-    //   const response = await axios.post('http://localhost:5000/api/users/send-otp', {
-    //     email: user.email
-    //   });
+      // Send OTP to user's email
+      console.log('Making request to: http://localhost:5000/api/users/send-otp');
+      const response = await axios.post('http://localhost:5000/api/users/send-otp', {
+        email: user.email
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    //   console.log('OTP response:', response.data);
+      console.log('Full OTP response:', response);
+      console.log('OTP response data:', response.data);
       
-    //   if (response.data.success) {
-    //     setShowOtpPopup(true);
-    //     setError('');
-    //   } else {
-    //     setError(response.data.message || 'Failed to send OTP');
-    //   }
-    // } catch (err) {
-    //   console.error('OTP send error:', err);
-    //   setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
-    // }
+      if (response.data.success) {
+        setShowOtpPopup(true);
+        setError('');
+      } else {
+        setError(response.data.message || 'Failed to send OTP');
+      }
+    } catch (err) {
+      console.error('OTP send error:', err);
+      setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
+    }
   };
 
   const handleOtpSubmit = async (e) => {
@@ -97,7 +103,20 @@ function ChangePassword() {
         setShowOtpPopup(false);
         setOtp('');
         setNewPassword('');
-        alert('Password updated successfully!');
+        setOtpError('');
+        
+        // First navigate to home
+        navigate('/');
+        
+        // Then show the success notification
+        setTimeout(() => {
+          dispatch(showSuccessNotification('Great! Your password has been reset and you are now logged in'));
+          
+          // Auto hide after 10 seconds
+          setTimeout(() => {
+            dispatch(hideSuccessNotification());
+          }, 10000);
+        }, 100);
       } else {
         setOtpError(response.data.message || 'Failed to verify OTP');
       }
@@ -122,11 +141,10 @@ function ChangePassword() {
   };
 
   return (
-
     <>
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Navbar />
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <Navbar />
 
       {/* Breadcrumb */}
       <div className="bg-white rounded-sm ml-33 w-[998px] px-4 py-2">

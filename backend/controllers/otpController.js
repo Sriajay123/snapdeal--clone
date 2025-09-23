@@ -1,10 +1,11 @@
 import User from '../models/userSchema.js';
 import OTP from '../models/otpSchema.js';
 import  sendOtp  from '../utils/sendOtp.js';
+import bcrypt from 'bcrypt'
 
 // Generate a random 6-digit OTP
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return String(Math.floor(1000 + Math.random() * 9000));
 };
 
 // Send OTP
@@ -39,8 +40,9 @@ export const sendOTPController = async (req, res) => {
     });
 
     // Send OTP to user's email
-    await sendOtp(email, otpCode);
-
+    await sendOtp(user, otpCode);
+    console.log('OTP sent successfully to:', user.email);
+    
     res.status(200).json({
       success: true,
       message: "OTP sent successfully"
@@ -59,7 +61,7 @@ export const sendOTPController = async (req, res) => {
 // Verify OTP and change password
 export const verifyOTPAndChangePassword = async (req, res) => {
   try {
-    const { email, otp, newPassword } = req.body;
+    let { email, otp, newPassword } = req.body;
 
     // Find user
     const user = await User.findOne({ email });
@@ -83,6 +85,8 @@ export const verifyOTPAndChangePassword = async (req, res) => {
         message: "Invalid or expired OTP"
       });
     }
+        const salt = await bcrypt.genSalt(10);
+        newPassword = await bcrypt.hash(newPassword, salt);
 
     // Update password
     user.password = newPassword;

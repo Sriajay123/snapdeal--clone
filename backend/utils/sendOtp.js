@@ -21,13 +21,18 @@ import twilio from "twilio";
 
   try {
     if (user.email) {
+      console.log('Attempting to send email with config:', {
+        from: process.env.EMAIL_USER,
+        to: user.email
+      });
+      
       await transporter.sendMail({
         from: `"SNAPDEAL" <${process.env.EMAIL_USER}>`,
         to: user.email,
         subject: "SNAPDEAL",
         text: `${otpCode} is your verification code to login to your Snapdeal Account. It is valid for 5 minutes. DO NOT share this code with anyone. - Team Snapdeal`,
       });
-      console.log(`OTP sent to email: ${user.email}`);
+      console.log(`OTP sent successfully to email: ${user.email}`);
     }
 
     // if (user.phone) {
