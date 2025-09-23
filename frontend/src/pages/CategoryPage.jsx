@@ -13,10 +13,9 @@ import PaymentFooter from "../components/PaymentFooter.jsx";
 import ContentFooter from "../components/ContentFooter.jsx";
 import CustomerTrustSection from "../components/CustomerTrustSection.jsx";
 
+
 // Utility function to return the original name since we're using the exact database names now
 const getDisplayName = (name) => name;
-
-// Define category structure
 const categoryStructure = {
 
 
@@ -40,7 +39,10 @@ const categoryStructure = {
       name:'Slippers & Flip Flops',
       subTypes:['Slippers For Men','Boots For Men','Ethnic Footwear For Men','Men Shoes Accessories','Men-Sandals & Floater'],
     },
-    
+    'Formal Shoes':{
+      name:'Formal Shoes',
+      subTypes:[]
+    }
     
     
   }
@@ -177,37 +179,100 @@ const categoryStructure = {
    },
 
   },
-  "Kids & Toys": {
-    name: "Kids & Toys",
+  "Toys": {
+    name: "Toys",
     subcategories: {
-      'Toys': {
-        name: 'Toys',
-        subTypes: ['Educational Toys', 'Soft Toys', 'Outdoor Toys', 'Board Games']
+      'Toy Cars': {
+        name: 'Toy Cars',
+        subTypes: [ 'Educational Toys', 'Soft Toys', 'Outdoor Toys', 'Board Games']
       },
-      'Kids Clothing': {
-        name: 'Kids Clothing',
-        subTypes: ['Boys Clothing', 'Girls Clothing', 'Baby Clothing']
-      },
-      'School Supplies': {
-        name: 'School Supplies',
-        subTypes: ['School Bags', 'Stationery', 'Lunch Boxes']
+      
+    }
+  },
+  "CarElectronics":{
+    name:"CarElectronics",
+    subcategories:{
+      'Bluetooth Devices':{
+        name:'Bluetooth Devices',
+        subTypes:['Car Bluetooth Speakers','Car Bluetooth FM Transmitter','Car Bluetooth Handsfree']
       }
     }
   },
-  'Electronics': {
-    name: "Electronics",
-    subcategories: {
-      'Mobile Phones': {
-        name: 'Mobile Phones',
-        subTypes: ['Smartphones', 'Feature Phones', 'Mobile Accessories']
+
+  "CarAccessories":{
+    name:"CarAccessories",
+    subcategories:{
+      'Car Body Covers':{
+        name:'Car Body Covers',
+        subTypes:['Car Body Covers','Car Wraps & Reflective Tapes','Grills & Carriers',
+          'Door, Bumper & Bull Guards','Door Sills']
+        }
+
+
+      }
+  },
+  "MobileCases":{ 
+    name:"MobileCases",
+    subcategories:{
+      'Printed Back Covers':{
+        name:'Printed Back Covers',
+        subTypes:['Flip Covers','Plain Back Covers','Printed Back Covers','Powerbank Pouch & Case']
+      }
+    }
+  },
+  "Speakers":{
+    name:"Speakers",
+    subcategories:{
+      'Bluetooth Speakers':{
+        name:'Bluetooth Speakers',
+        subTypes:['Home Audio Speakers','Soundbars','Party Speakers','Outdoor Speakers']
+      } 
+    }
+  },
+  "Fitness":{
+    name:"Fitness",
+    subcategories:{
+      'Yoga Mats':{
+        name:'Yoga Mats',
+        subTypes:['Yoga Mats','Yoga Accessories','Exercise Mats']
+      }
+      
+    }
+  },
+  ComputerAccessories:{
+    name:"ComputerAccessories",
+    subcategories:{
+      'Mouse':{
+        name:'Mouse',
+        subTypes:['Mouse','Keyboards','Webcams','Mouse Pads']
+      }
+    }
+  },
+  "Books":{
+    name:"Books",
+    subcategories:{
+                               
+      'IIT JEE':{
+        name:'IIT JEE',
+        subTypes:['Civil Services Exams','Engineering Entrance Exams','Management Entrance Exams',
+             'Government Entrance Exams']
+      }
+    }
+  },
+  "Collectibles":{
+    name:"Collectibles",
+    subcategories:{
+      'Coins':{ 
+        name:'Coins',
+        subTypes:[]
       },
-      'Laptops': {
-        name: 'Laptops',
-        subTypes: ['Gaming Laptops', 'Business Laptops', 'Student Laptops']
+      'Paper Currency':{
+        name:'Paper Currency',
+        subTypes:[]
       },
-      'Audio': {
-        name: 'Audio',
-        subTypes: ['Headphones', 'Speakers', 'Earbuds']
+      'Postcards & Stamps':{
+        name:'Postcards & Stamps',
+        subTypes:[]
       }
     }
   }
@@ -227,6 +292,8 @@ function CategoryPage() {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [showAllOptions, setShowAllOptions] = useState({});
   const [deliveryPincode, setDeliveryPincode] = useState("584128");
+  const [isEditingPincode, setIsEditingPincode] = useState(false);
+  const [tempPincode, setTempPincode] = useState("");
   const [selectedDiscount, setSelectedDiscount] = useState([]);
 
   const handleDiscountChange = (value) => {
@@ -251,39 +318,33 @@ function CategoryPage() {
     fetchProducts();
     // Reset error state when category/subcategory changes
     setError(null);
-  }, [category, subcategory, baseCategory, urlSubcategory, appliedPriceRange, selectedFilters]);
+  }, [category, subcategory, appliedPriceRange, selectedFilters]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Directly use the category and subcategory names since we're using consistent names
       let endpoint = `/api/product/category/${encodeURIComponent(category)}`;
       if (subcategory) {
         endpoint += `/${encodeURIComponent(subcategory)}`;
       }
 
-      // Add filters to query params
       const queryParams = new URLSearchParams();
       
-      // Add price range
       if (appliedPriceRange.min) queryParams.append('minPrice', appliedPriceRange.min);
       if (appliedPriceRange.max) queryParams.append('maxPrice', appliedPriceRange.max);
       
-      // Add selected filters
       Object.entries(selectedFilters).forEach(([key, values]) => {
         if (values && values.length > 0) {
           switch (key) {
             case 'rating':
-              // Convert rating filter to number (e.g., "4★ & above" -> 4)
               const rating = parseInt(values[0]);
               if (!isNaN(rating)) {
                 queryParams.append('minRating', rating);
               }
               break;
             case 'discount':
-              // Handle discount ranges
               values.forEach(range => {
                 const [min, max] = range.split('-').map(Number);
                 if (!isNaN(min)) queryParams.append('minDiscount', min);
@@ -291,13 +352,14 @@ function CategoryPage() {
               });
               break;
             case 'colors':
+              queryParams.append('color', values.join(','));
+              break;
             case 'brand':
-              // For colors and brand filters
-              queryParams.append(key.replace('colors', 'color'), values.join(','));
+              queryParams.append('brand', values.join(','));
               break;
             default:
-              // For any other filters
               queryParams.append(key, values.join(','));
+              break;
           }
         }
       });
@@ -335,24 +397,19 @@ function CategoryPage() {
     } else {
       setMaxPrice(Math.max(value, minPrice + 1));
     }
-    setPriceRange([minPrice, maxPrice]);
   };
 
   const renderBreadcrumbs = () => {
-    // Don't render if we don't have category info
     if (!categoryInfo) return null;
 
     return (
       <div className="bg-[#f7f7f7]">
         <div className="max-w-7xl ml-27 px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            {/* Home Link */}
             <Link to="/" className="hover:text-red-600 transition-colors">
               Home
             </Link>
             <span className="text-gray-400">/</span>
-
-            {/* Category Link */}
             <Link 
               to={`/products/${encodeURIComponent(baseCategory)}`} 
               className="hover:text-red-600 transition-colors"
@@ -370,11 +427,6 @@ function CategoryPage() {
                 </Link>
               </>
             )}
-
-
-           
-
-            
           </nav>
         </div>
       </div>
@@ -382,12 +434,10 @@ function CategoryPage() {
   };
 
   const renderSidebar = () => {
-    // Get the appropriate filters based on category and subcategory
     const currentFilters = urlSubcategory
       ? categoryFilters[baseCategory]?.subcategories?.[urlSubcategory]
       : categoryFilters[baseCategory]?.default;
 
-    // Add counts to subcategories
     const categoryDataWithCounts = categoryInfo ? {
       ...categoryInfo,
       subcategories: Object.entries(categoryInfo.subcategories).reduce((acc, [key, value]) => ({
@@ -400,38 +450,26 @@ function CategoryPage() {
       }), {})
     } : null;
 
-    // Get rating options
     const ratingOptions = [
       { value: 4, label: '4★ & above' },
       { value: 3, label: '3★ & above' },
       { value: 2, label: '2★ & above' },
     ];
 
-    // Get discount options
-    const discountOptions = [
-      { value: '50-100', label: '50% and above' },
-      { value: '30-50', label: '30% - 50%' },
-      { value: '20-30', label: '20% - 30%' },
-      { value: '10-20', label: '10% - 20%' },
-    ];
-
-    // Get current filters based on category and subcategory
     const availableFilters = urlSubcategory
       ? categoryFilters[baseCategory]?.subcategories?.[urlSubcategory]
       : categoryFilters[baseCategory]?.default;
 
-    // Convert the filters to the format needed by FilterAccordion
     const filterOptions = {
       rating: ratingOptions,
       ...(availableFilters && Object.entries(availableFilters).reduce((acc, [key, filter]) => {
-        if (key === 'priceRange') return acc; // Skip priceRange as it's handled separately
-        if (!filter || !filter.options) return acc; // Skip if filter or options are undefined
+        if (key === 'priceRange') return acc;
+        if (!filter || !filter.options) return acc;
         return {
           ...acc,
           [key]: filter.options.map(option => ({
             value: option,
             label: option,
-            
           }))
         };
       }, {}))
@@ -439,7 +477,6 @@ function CategoryPage() {
 
     return (
       <div className="w-64 bg-white border-r border-gray-200 min-h-screen p-4">
-        {/* Category Accordion */}
         {categoryInfo && (
           <CategoryAccordion
             title={getDisplayName(baseCategory)}
@@ -450,7 +487,6 @@ function CategoryPage() {
           />
         )}
 
-        {/* Price Filter */}
         <FilterAccordion
           title="Price"
           type="price"
@@ -478,16 +514,13 @@ function CategoryPage() {
           }}
         />
 
-        {/* Dynamic Filters */}
         {filterOptions && Object.entries(filterOptions).map(([filterKey, options]) => {
           if (!options) return null;
           
-          // Determine filter type based on filterKey
           let filterType = 'checkbox';
           if (filterKey === 'rating') filterType = 'star';
           if (filterKey === 'colors') filterType = 'color';
 
-          // Get appropriate title based on filterKey
           const getTitleCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);
           const title = filterKey === 'rating' ? 'Customer Rating' : getTitleCase(filterKey);
 
@@ -507,14 +540,12 @@ function CategoryPage() {
                       : [...(prev[filterKey] || []), value]
                   };
                   
-                  // If no values are selected for this filter, remove it from selectedFilters
                   if (newFilters[filterKey].length === 0) {
                     delete newFilters[filterKey];
                   }
                   
                   return newFilters;
                 });
-                // Fetch products with new filters
                 fetchProducts();
               }}
             />
@@ -578,122 +609,202 @@ function CategoryPage() {
 
     return (
       <div>
-       {/* Delivery Location*/}
-        <div className="flex items-center gap-2  mb-6 border-b border-gray-300 bg-white">
-            <input type="checkbox" className="mr-2 h-3 w-3" />
-          <span className="text-gray-600 mb-2">Deliver to:</span>
-          <span className="text-red-600 mb-2">584128</span>
-          
+        <div className="flex items-center justify-between p-4 mb-6 border-b border-gray-100 bg-white">
+          {!isEditingPincode ? (
+            <div className="flex items-center gap-2">
+              <input type="checkbox" className="mr-2 h-5 w-5" />
+              <span className="text-gray-600">Deliver to:</span>
+              <span className="text-[#e40046] font-medium cursor-pointer" onClick={() => setIsEditingPincode(true)}>
+                {deliveryPincode}
+                <i className="fas fa-pencil-alt ml-2 text-sm"></i>
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <input
+                type="text"
+                value={tempPincode}
+                onChange={(e) => setTempPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="584128"
+                className="w-24 px-2 py-1 border border-gray-300 rounded text-center"
+                maxLength="6"
+                autoFocus
+              />
+              <button
+                onClick={() => {
+                  if (tempPincode.length === 6) {
+                    setDeliveryPincode(tempPincode);
+                    setIsEditingPincode(false);
+                  }
+                }}
+                className="text-[#e40046] font-medium hover:text-[#c2003d]"
+              >
+                Check
+              </button>
+            </div>
+          )}
         </div>
-        
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {products.map((product) => (
-            <Link
-              key={product._id}
-              to={`/product/${product.keyword.toLowerCase().replace(/\s+/g, '-')}/${product._id}`}
-              className="bg-white border border-gray-200 hover:border-[#f6f6f6] hover:shadow-xl hover-bg-white transition-all duration-200"
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  {products.map((product) => (
+    <div
+      key={product._id}
+      className="bg-white border border-gray-200 hover:border-[#f6f6f6] hover:shadow-xl hover:bg-white transition-all duration-200 group relative"
+    >
+      <Link to={`/product/${product.keyword.toLowerCase().replace(/\s+/g, '-')}/${product._id}`}>
+        <div className="relative">
+          <img
+            src={product.images[0] || "https://source.unsplash.com/random/300x300/?product"}
+            alt={product.name}
+            className="w-full h-64 object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "https://source.unsplash.com/random/300x300/?product";
+            }}
+          />
+          {/* Offer Tag */}
+          {product.mrp > product.price && (
+            <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 text-xs rounded">
+              {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+            </div>
+          )}
+          
+          {/* Quick View Button - Shows on Hover */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center mt-50">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                // Add quick view functionality here
+              }} 
+              className=" bg-[#333333] opacity-75 text-gray-800 px-6 py-2 text-sm text-white hover:bg-black hover:text-white rounded"
             >
-              <div className="relative">
-                <img
-                  src={product.images[0] || "https://source.unsplash.com/random/300x300/?product"}
-                  alt={product.name}
-                  className="w-full h-64 object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "https://source.unsplash.com/random/300x300/?product";
-                  }}
-                />
-                {/* Offer Tag */}
-                {product.mrp > product.price && (
-                  <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 text-xs rounded">
-                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
-                  </div>
-                )}
-              </div>
-              <div className="p-3">
-                <h3 className="text-sm text-gray-800 mb-2 line-clamp-2 leading-tight h-10">
-                  {product.name}
-                </h3>
-                
-                
-                <div className="flex items-center gap-2 flex-nowrap">
-                          <span className="line-through text-gray-400 text-sm whitespace-nowrap">
-                            Rs {product.oldPrice || product.price + 100}
-                          </span>
-                          <span className=" text-[#333333] text-md whitespace-nowrap">
-                            Rs {product.price}
-                          </span>
-                          <span className="text-xs text-gray-600 px-2 py-1 border border-gray-200 rounded shrink-0 whitespace-nowrap">
-                            {product.oldPrice
-                              ? Math.round(100 - (product.price / product.oldPrice) * 100)
-                              : Math.round(100 - (product.price / (product.price + 100)) * 100)}
-                            % OFF
-                          </span>
-                        </div>
+              QUICK VIEW
+            </button>
+          </div>
 
-                {/* Rating */}
-                {product.rating && (
-                  <div className="mb-2 flex items-center">
-                          {[1, 2, 3, 4, 5].map(star => (
-                            <svg
-                              key={star}
-                              className={`w-3 h-3 mr-1 ${product.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.174 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
-                            </svg>
-                          ))}
-                        </div>
-                )}
-              </div>
-            </Link>
+          {/* Size and Color Dropdown - Shows on Hover */}
+<div className="absolute left-0 right-0 top-[calc(100%+90px)] bg-white opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg border border-gray-200 z-20">
+  {/* Color Selection */}
+  {product.colors && product.colors.length > 0 && (
+    <div className="p-3 border-b border-gray-100">
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-gray-600 min-w-[40px]">Color:</span>
+        <div className="flex items-center gap-1">
+          {product.colors.map(color => (
+            <div 
+              key={color}
+              className="w-5 h-5 border border-gray-300 cursor-pointer hover:border-[#e40046] transition-colors rounded-full"
+              style={{ backgroundColor: color }}
+              title={color}
+            />
           ))}
         </div>
+      </div>
+    </div>
+  )}
+  
+  {/* Size Selection */}
+  {product.sizes && product.sizes.length > 0 && (
+    <div className="p-3">
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-gray-600 min-w-[40px]">Size:</span>
+        <div className="flex items-center gap-1">
+          {product.sizes.map(size => (
+            <div 
+              key={size}
+              className="w-6 h-6  flex items-center justify-center text-xs cursor-pointer hover:border-[#e40046] transition-colors bg-white"
+            >
+              {size}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+        </div>
+        <div className="p-3">
+          <div className="h-10">
+            <h3 className="text-sm text-gray-800 font-medium hover:text-[#e40046] transition-colors line-clamp-2 leading-tight">
+              {product.name}
+            </h3>
+          </div>
+          
+          <div className="flex items-center gap-2 flex-nowrap mt-2">
+            <span className="line-through text-gray-400 text-sm whitespace-nowrap">
+              Rs {product.oldPrice || product.price + 100}
+            </span>
+            <span className="text-[#333333] text-md whitespace-nowrap">
+              Rs {product.price}
+            </span>
+            <span className="text-xs text-gray-600 px-2 py-1 border border-gray-200 rounded shrink-0 whitespace-nowrap">
+              {product.oldPrice
+                ? Math.round(100 - (product.price / product.oldPrice) * 100)
+                : Math.round(100 - (product.price / (product.price + 100)) * 100)}
+              % OFF
+            </span>
+          </div>
+
+          {product.rating && (
+            <div className="mb-2 flex items-center mt-2">
+              {[1, 2, 3, 4, 5].map(star => (
+                <svg
+                  key={star}
+                  className={`w-3 h-3 mr-1 ${product.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.174 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
+                </svg>
+              ))}
+            </div>
+          )}
+        </div>
+      </Link>
+    </div>
+  ))}
+</div>
+        
+ 
+        
       </div>
     );
   };
 
   return (
     <>
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Navbar />
-
-      {renderBreadcrumbs()}
-      <TrendingSearches/>
-      <div className="max-w-7xl mx-auto px-4 py-6">
-
-        <div className="flex gap-6">
-          {renderSidebar()}
-          <div className="flex-1">
-            <div className="bg-white p-4 mb-4 flex justify-between items-center">
-              <h1 className="text-xl font-medium text-gray-900">
-                {subcategoryInfo ? getDisplayName(urlSubcategory) : getDisplayName(baseCategory)}
-              </h1>
-              <SortDropdown value={sortBy} onChange={handleSortChange} />
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <Navbar />
+        {renderBreadcrumbs()}
+        <TrendingSearches/>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex gap-6">
+            {renderSidebar()}
+            <div className="flex-1">
+              <div className="bg-white p-4 mb-4 flex justify-between items-center">
+                <h1 className="text-xl font-medium text-gray-900">
+                  {subcategoryInfo ? getDisplayName(urlSubcategory) : getDisplayName(baseCategory)}
+                </h1>
+                <SortDropdown value={sortBy} onChange={handleSortChange} />
+              </div>
+              {renderProducts()}
             </div>
-            {renderProducts()}
           </div>
         </div>
       </div>
-    </div>
 
-
-     <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen mt-10">
-            <CustomerTrustSection/>
-            <ContentFooter/>
-            <PaymentFooter/>
-            <div className='bg-white w-full  h-11 flex  items-center justify-between  text-xs text-[#949aa2] '>
-          <span className=' mt-3 ml-10'>Copyright © 2021, Snapdeal Limited. All Rights Reserved</span>
-          <span className='mr-15' >Made for Bharat 
-           <i className="fa-solid fa-heart text-red-500 hover:scale-125 transition-transform duration-300 ml-2"></i>
-            </span>
-             </div> 
+      <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen mt-10">
+        <CustomerTrustSection/>
+        <ContentFooter/>
+        <PaymentFooter/>
+        <div className="bg-white w-full h-11 flex items-center justify-between text-xs text-[#949aa2]">
+          <span className="mt-3 ml-10">Copyright © 2021, Snapdeal Limited. All Rights Reserved</span>
+          <span className="mr-15">
+            Made for Bharat
+            <i className="fa-solid fa-heart text-red-500 hover:scale-125 transition-transform duration-300 ml-2"></i>
+          </span>
         </div>
-
+      </div>
     </>
   );
 }

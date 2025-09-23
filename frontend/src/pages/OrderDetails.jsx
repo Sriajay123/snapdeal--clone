@@ -10,6 +10,8 @@ function OrderDetails() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    let user=localStorage.getItem('user');
+     user = JSON.parse(user);
 
     useEffect(() => {
         const intervalId = setInterval(fetchOrderDetails, 5000); // Refresh every 5 seconds
@@ -203,7 +205,7 @@ function OrderDetails() {
                                 <h3 className="text-base font-semibold text-gray-800 mb-3">Customer Information</h3>
                                 <div className="text-sm text-gray-600 space-y-1">
                                  
-                                    <div>Email: <span className="text-gray-800">{order.customerInfo?.email || order.customerEmail || 'Email not available'}</span></div>
+                                    <div>Email: <span className="text-gray-800">{order.customerInfo?.email || user.email || 'Email not available'}</span></div>
                               
                                 </div>
                             </div>
@@ -265,7 +267,7 @@ function OrderDetails() {
                                         {/* Product Image */}
                                         <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                                             <img
-                                                src={item?.productDetails?.image || item?.product?.image || "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image"}
+                                                src={item?.productDetails?.image || item?.product?.images[0] || "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image"}
                                                 alt={item?.productDetails?.name || item?.product?.name || "Product"}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {

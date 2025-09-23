@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import OTPVerificationPopup from "./OTPVerificationPopup";
+ import OTPVerificationPopup from "./OTPVerificationPopup";
 
 function CartFooter({ subtotal, onCartClose }) {
     const [showOTPPopup, setShowOTPPopup] = useState(false);

@@ -630,8 +630,8 @@ function Sidebar({ isHoverState, onProductClick }) {
             </div>
 
             <div className="flex flex-col text-[11px] text-gray-500 px-4 pb-4 space-y-1 ">
-              <Link 
-                to="/products/Kitchenware" 
+              <Link
+                to="/products/Kitchenware"
                 onClick={() => onProductClick && onProductClick()}
                 className="flex items-center py-1 cursor-pointer no-underline text-gray-500 hover:text-gray-700"
               >
@@ -693,7 +693,7 @@ function Sidebar({ isHoverState, onProductClick }) {
                               linkPath = `/products/Men's Fashion`;
                           }
                         } else if (hoveredCategory === "Men's Fashion" && subcategory === "FOOTWEAR") {
-                            switch (item) {
+                          switch (item) {
                             case "Sports Shoes":
                               linkPath = "/products/Footwear/Sports Shoes";
                               break;
@@ -701,10 +701,13 @@ function Sidebar({ isHoverState, onProductClick }) {
                               linkPath = '/products/Footwear/Casual Shoes'
                               break;
                             case "Slippers & Flip Flops":
-                              linkPath ='/products/Footwear/Slippers & Flip Flops'
+                              linkPath = '/products/Footwear/Slippers & Flip Flops'
                               break;
                             case "Sandals & Floaters":
-                              linkPath ='/products/Footwear/Sandals & Floaters'
+                              linkPath = '/products/Footwear/Sandals & Floaters'
+                              break;
+                            case "Formal Shoes":
+                              linkPath = '/products/Footwear/Formal Shoes'
                               break;
                             default:
                               linkPath = '/products/Footwear'
@@ -719,18 +722,18 @@ function Sidebar({ isHoverState, onProductClick }) {
                               case "Sarees":
                                 linkPath = "/products/Ethnic Wear/Sarees"
                                 break;
-                               case "Kurtas & Kurtis":
+                              case "Kurtas & Kurtis":
                                 linkPath = "/products/Ethnic Wear/Kurtas & Kurtis"
                                 break;
-                            
+
 
                               default:
                                 linkPath = "/products/Ethnic Wear"
                             }
                           }
 
-                          
-                          else if (subcategory === "FOOTWEAR"){
+
+                          else if (subcategory === "FOOTWEAR") {
                             switch (item) {
                               case "Heels":
                                 linkPath = "/products/WomenFootwear/Heels"
@@ -739,21 +742,21 @@ function Sidebar({ isHoverState, onProductClick }) {
                                 linkPath = "/products/WomenFootwear"
                             }
                           }
-                          
 
-                            else{
+
+                          else {
                             linkPath = `/product/${encodeURIComponent(subcategory)}`;
-                            }
+                          }
 
-                         }
+                        }
                         else if (hoveredCategory === "Home & Kitchen") {
                           if (subcategory === "KITCHEN APPLIANCES") {
-                            switch (item) { 
+                            switch (item) {
                               case "Juicer Mixer Grinders":
                                 linkPath = "/products/KitchenAppliances/Juicer Mixer Grinders"
                                 break;
 
-                                default:
+                              default:
                                 linkPath = "/products/KitchenAppliances"
                             }
                           }
@@ -762,39 +765,153 @@ function Sidebar({ isHoverState, onProductClick }) {
                               case "Pressure Cookers":
                                 linkPath = "/products/Kitchenware/Pressure Cookers"
                                 break;
-                                default:
+                              default:
                                 linkPath = "/products/Kitchenware"
-                           }
+                            }
                           }
                         }
-                       else if (hoveredCategory === "Toys, Kids' Fashion & More") {
-                           
-                       }
-                        else {
-                        linkPath = `/product/${encodeURIComponent(item)}`;
+                        else if (hoveredCategory === "Toys, Kids' Fashion & More") {
+                          if (subcategory === "TOYS") {
+
+                            switch (item) {
+                              case "Toy Cars":
+                                linkPath = "/products/Toys/Toy Cars"
+                                break;
+                              case "Educational Toys":
+                                linkPath = "/products/Toys/Educational Toys"
+                                break;
+                              default:
+                                linkPath = "/products/Toys"
+                            }
+                          }
+                        }
+                        else if (hoveredCategory == "Automotives") {
+                          if (subcategory === "CAR & VEHICLE ElECTRONICS") {
+                            switch (item) {
+                              case "Bluetooth Devices":
+                                linkPath = "/products/CarElectronics/Bluetooth Devices"
+                                break;
+                              default:
+                                linkPath = "/products/CarElectronics"
+                            }
+                          }
+                          else if (subcategory === "CAR ACCESSORIES") {
+                            switch (item) {
+                              case "Car Body Covers":
+                                linkPath = "/products/CarAccessories/Car Body Covers"
+                                break;
+                              default:
+                                linkPath = "/products/CarAccessories"
+                            }
+                          }
+                        }
+                        else if (hoveredCategory === "Mobile & Accessories") {
+                          if (subcategory === "MOBILE CASES & COVERS") {
+                            switch (item) {
+                              case "Printed Back Covers":
+                                linkPath = "/products/MobileCases/Printed Back Covers"
+                                break;
+                              default:
+                                linkPath = "/products/MobileCases"
+                            }
+                          }
                         }
 
-                      return (
-                      <Link
-                        key={itemIndex}
-                        to={linkPath}
-                        onClick={() => onProductClick && onProductClick()}
-                        className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${item === "View All"
-                          ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group"
-                          : "text-gray-600 hover:text-black"
-                          }`}
-                        title={item}
-                      >
-                        {item === "View All" ? (
-                          <>
-                            <span>View All</span>
-                            <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
-                          </>
-                        ) : (
-                          item
-                        )}
-                      </Link>
-                      );
+                        else if (hoveredCategory === "Electronics") {
+                          if (subcategory === "SPEAKERS") {
+                            switch (item) {
+                              case "Bluetooth Speakers":
+                                linkPath = "/products/Speakers/Bluetooth Speakers"
+                                break;
+                              default:
+                                linkPath = "/products/Speakers"
+                            }
+                          }
+                        }
+                        else if (hoveredCategory === "Sports, Fitness & Outdoor") {
+                          if (subcategory === "GET FIT AT HOME") {
+                            switch (item) {
+                              case "Yoga Mats":
+                                linkPath = "/products/Fitness/Yoga Mats"
+                                break;
+                              default:
+                                linkPath = "/products/Fitness"
+                            }
+                          }
+                        }
+                        else if (hoveredCategory === "Computers & Gaming") {
+                          if (subcategory === "COMPUTER ACCESSORIES") {
+                            switch (item) {
+                              case "Mouse":
+                                linkPath = "/products/ComputerAccessories/Mouse"
+                                break;
+                              default:
+                                linkPath = "/products/ComputerAccessories"
+                            }
+                          }
+                        }
+                        else if (hoveredCategory === "Books, Media & Music") {
+                          if (subcategory === "TOP EXAMS") {
+                            switch (item) {
+                              case "IIT JEE":
+                                linkPath = "/products/Books/IIT JEE"
+                                break;
+                              default:
+                                linkPath = "/products/Books"
+                            }
+                          }
+
+                        }
+                        else if (hoveredCategory === "Hobbies") {
+                          if (subcategory === "Arts & Crafts") {
+                            linkPath = "/products/Arts & Crafts"
+                          }
+                          else if (subcategory === "Collectibles") {
+                            switch (item) {
+                              case "Coins":
+                                linkPath = "/products/Collectibles/Coins"
+                                break;
+                              default:
+                                linkPath = "/products/Collectibles"
+                            }
+                          }
+
+
+
+                        }
+
+
+
+
+
+
+                        else {
+                          linkPath = `/product/${encodeURIComponent(item)}`;
+                        }
+
+
+
+                        return (
+                          <Link
+                            key={itemIndex}
+                            to={linkPath}
+                            onClick={() => onProductClick && onProductClick()}
+                            className={`block text-[10px] py-0.5 leading-tight truncate no-underline transition-colors ${item === "View All"
+                              ? "text-blue-600 hover:text-blue-800 font-medium flex items-center group"
+                              : "text-gray-600 hover:text-black"
+                              }`}
+                            title={item}
+                          >
+                            {item === "View All" ? (
+                              <>
+                                <span>View All</span>
+                                <span className="ml-1 mb-1 text-lg transform transition-transform duration-200 group-hover:translate-x-1">›</span>
+                              </>
+                            ) : (
+                              item
+                            )}
+                          </Link>
+                        );
                       })}
                       {items.length > 8 && (
                         <Link
