@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
+import { Link } from "react-router-dom";
 
 function OrderDetails() {
     const { orderNumber } = useParams();
@@ -266,6 +267,7 @@ function OrderDetails() {
                                     <div className="flex items-start gap-4 mb-6">
                                         {/* Product Image */}
                                         <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                                            <Link to ={`/product/${item?.productDetails?.keyword?.toLowerCase().replace(/\s+/g, '-') || item?.product?.keyword?.toLowerCase().replace(/\s+/g, '-')}/${item?.productDetails?._id || item?.product?._id}`}>
                                             <img
                                                 src={item?.productDetails?.image || item?.product?.images[0] || "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image"}
                                                 alt={item?.productDetails?.name || item?.product?.name || "Product"}
@@ -274,6 +276,7 @@ function OrderDetails() {
                                                     e.target.src = "https://placehold.co/80x80/f0f0f0/999999/png?text=No+Image";
                                                 }}
                                             />
+                                            </Link>
                                         </div>
                                         
                                         {/* Product Details */}
@@ -430,6 +433,8 @@ function OrderDetails() {
                                         </div>
                                     </div>
                                 </div>
+
+                                
                             ))}
                         </div>
 

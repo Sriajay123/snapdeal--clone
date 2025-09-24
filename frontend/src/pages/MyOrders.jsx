@@ -259,6 +259,7 @@ function MyOrders() {
                                                             <div className="p-6">
                                                                 <div className="flex gap-4 mb-6">
                                                                     <div className="w-24 h-24 rounded bg-white flex-shrink-0 overflow-hidden">
+                                                                        <Link to ={`/product/${item?.productDetails?.keyword?.toLowerCase().replace(/\s+/g, '-') || item?.product?.keyword?.toLowerCase().replace(/\s+/g, '-')}/${item?.productDetails?._id || item?.product?._id}`}>
                                                                         <img
                                                                             src={item?.productDetails?.image || item?.product?.images[0] || "https://placehold.co/96x96/f0f0f0/999999/png?text=No+Image"}
                                                                             alt={item?.productDetails?.name || item?.product?.name || "Product"}
@@ -267,6 +268,7 @@ function MyOrders() {
                                                                                 e.target.src = "https://placehold.co/96x96/f0f0f0/999999/png?text=No+Image";
                                                                             }}
                                                                         />
+                                                                        </Link>
                                                                     </div>
 
                                                                     <div className="flex-1">

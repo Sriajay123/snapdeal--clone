@@ -167,11 +167,13 @@ function Delivery() {
                 className="flex items-center justify-between p-2 rounded hover:bg-gray-50 group relative"
               >
                 <div className="flex items-center">
+                  <Link to={`/product/${item.product.keyword?.toLowerCase().replace(/\s+/g, '-')}/${item.product._id}`}>
                   <img
                     src={Array.isArray(item.product.images) ? item.product.images[0] : item.product.image}
                     alt={item.product.name}
                     className="w-12 h-12 object-cover mr-2"
                   />
+                  </Link>
                   <div>
                     <p className="font-medium text-xs">{truncateText(item.product.keyword, 3)}</p>
                     <p className="text-gray-600 text-xs">₹{item.product.price}</p>

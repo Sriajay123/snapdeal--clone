@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { setPincode } from "../store/pincodeSlice";
 import CartFooter from "./CartFooter";
+import { Link } from "react-router-dom";
 
 function CartDropdown({ isOpen, onClose }) {
     const cart = useSelector((state) => state.cart);
@@ -157,11 +158,13 @@ function CartDropdown({ isOpen, onClose }) {
                                             {/* Product Image */}
                                             <div className="col-span-3 flex items-start gap-3">
                                                 <div className="product-image">
+                                                  <Link to={`/product/${product.keyword?.toLowerCase().replace(/\s+/g, '-')}/${product._id}`}>
                                                     <img
                                                         className="w-16 h-16 object-contain border border-gray-200 rounded p-1"
                                                         src={product.images[0]}
                                                         alt={product.name}
                                                     />
+                                                  </Link>
                                                 </div>
                                                 <div className="product-details flex-1">
                                                     <div className="product-name mb-2">
