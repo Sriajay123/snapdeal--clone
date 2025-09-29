@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Environment variables
+.env
+
+# Version control
+.git
+.gitignore
+
+# IDE files
+.vscode
+
+# Logs
+logs
+*.log
+
+# Config files not needed in production
+nodemon.json
+
+
+Dockerfile
+docker-compose.yml

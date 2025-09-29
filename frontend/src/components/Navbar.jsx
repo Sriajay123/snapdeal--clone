@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import cartlogo from "../assets/Cart.png";
+import cartlogo from "../assets/cart.png";
 import signin from "../assets/signin.png";
 import Login from "./Login";
 import CartDropdown from "./CartDropdown";
