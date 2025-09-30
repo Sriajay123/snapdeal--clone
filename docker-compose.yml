@@ -13,6 +13,7 @@ services:
       - backend
     restart: unless-stopped
     environment:
+      # API endpoint inside container network
       - VITE_API_URL=http://backend:5000
 
   backend:
@@ -24,8 +25,6 @@ services:
     env_file:
       - ./backend/.env
     restart: unless-stopped
-    network_mode: "host"
     environment:
       - NODE_ENV=production
       - PORT=5000
-    
